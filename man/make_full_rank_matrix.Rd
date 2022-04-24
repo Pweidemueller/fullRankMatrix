@@ -19,6 +19,7 @@ Create a full rank matrix. The function first removes empty columns. The it disc
 c1 <- rbinom(10, 1, .4)
 c2 <- 1-c1
 c3 <- integer(10)
-mat <- as.matrix(data.frame(c1, c2, c3))
+c4 <- c1
+mat <- as.matrix(data.frame(c1, c2, c3, c4))
 make_full_rank_matrix(mat)
 }
