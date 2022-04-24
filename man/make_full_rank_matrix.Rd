@@ -2,24 +2,28 @@
 % Please edit documentation in R/make_full_rank_matrix.R
 \name{make_full_rank_matrix}
 \alias{make_full_rank_matrix}
-\title{Create a full rank matrix. The function first removes empty columns. The it discovers linear dependent columns, then renames and removes columns to make the matrix full rank.}
+\title{Create a full rank matrix}
 \usage{
-make_full_rank_matrix(mat)
+make_full_rank_matrix(mat, verbose = FALSE)
 }
 \arguments{
 \item{mat}{A matrix.}
+
+\item{verbose}{Print how column numbers change with each operation.}
 }
 \value{
 A matrix of full rank.
 }
 \description{
-Create a full rank matrix. The function first removes empty columns. The it discovers linear dependent columns, then renames and removes columns to make the matrix full rank.
+This function first removes empty columns. Then it discovers linear dependent columns, then renames and removes columns to make the matrix full rank.
 }
 \examples{
 c1 <- rbinom(10, 1, .4)
 c2 <- 1-c1
 c3 <- integer(10)
 c4 <- c1
-mat <- as.matrix(data.frame(c1, c2, c3, c4))
+c5 <- 2*c2
+mat <- as.matrix(data.frame(c1, c2, c3, c4, c5))
 make_full_rank_matrix(mat)
+mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
 }
