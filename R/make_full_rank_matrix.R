@@ -1,11 +1,14 @@
 #' Create a full rank matrix
 #'
-#' This function first removes empty columns. Then it discovers linear dependent columns, then renames and removes columns to make the matrix full rank.
+#' This function first removes empty columns. Then it discovers linear dependent columns, then removes and renames columns to make the matrix full rank.
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
 #'
-#' @return A matrix of full rank.
+#' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
+#'    * `(c1_AND_c2)`: column `c2` was removed because it was the same as column `c1`. Former `c1` was renamed to `(c1_AND_c2)`
+#'    * `c1_OR_(c2)`: column `c2` was removed because it was linearly dependent with `c1` (e.g. multiple of). Former `c1` was renamed to `c1_OR_(c2)`
+#'    * `c1_OR_(c3_COMB_c2)`: columns `c1`, `c2` and `c3` are linearly dependent of each other. In this example `c3` was removed and former `c1`, `c2` were renamed to `c1_OR_(c3_COMB_c2)` and `c2_OR_(c3_COMB_c1)`, respectively.
 #' @export
 #'
 #' @examples
@@ -14,6 +17,8 @@
 #' c3 <- integer(10)
 #' c4 <- c1
 #' c5 <- 2*c2
+#' c6 <- rbinom(10, 1, .8)
+#' c7 <- c5+c6
 #' mat <- as.matrix(data.frame(c1, c2, c3, c4, c5))
 #' make_full_rank_matrix(mat)
 #' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
@@ -51,7 +56,7 @@ merge_duplicated <- function(mat, verbose=FALSE) {
     stop(print("Input matrix has to be of type matrix. If your matrix is stored as a dataframe, convert like so: `mat <- as.matrix(mat)`."))
   }
   mat_unique <- unique(mat, MARGIN = 2)
-  mat_duplicated <- mat[, duplicated(mat, MARGIN = 2),drop=FALSE]
+  mat_duplicated <- mat[, duplicated(mat, MARGIN = 2), drop=FALSE]
   colnames_unique <- colnames(mat_unique)
   colnames_duplicated <- colnames(mat_duplicated)
   for (c in seq_len(ncol(mat_duplicated))){
@@ -90,7 +95,7 @@ find_lindependent_coef <- function(mat, verbose=FALSE) {
     }
   }
   colnames(mat) <- new_colnames
-  mat_red <- mat[, -linear_combs$remove]
+  mat_red <- mat[, -linear_combs$remove, drop=FALSE]
   if (verbose){
     print(sprintf("The matrix after finding linearly dependent columns contains %i rows and %i columns.",
                   dim(mat_red)[1], dim(mat_red)[2]))

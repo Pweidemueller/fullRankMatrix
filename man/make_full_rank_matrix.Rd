@@ -12,10 +12,15 @@ make_full_rank_matrix(mat, verbose = FALSE)
 \item{verbose}{Print how column numbers change with each operation.}
 }
 \value{
-A matrix of full rank.
+A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
+\itemize{
+\item \code{(c1_AND_c2)}: column \code{c2} was removed because it was the same as column \code{c1}. Former \code{c1} was renamed to \code{(c1_AND_c2)}
+\item \code{c1_OR_(c2)}: column \code{c2} was removed because it was linearly dependent with \code{c1} (e.g. multiple of). Former \code{c1} was renamed to \code{c1_OR_(c2)}
+\item \code{c1_OR_(c3_COMB_c2)}: columns \code{c1}, \code{c2} and \code{c3} are linearly dependent of each other. In this example \code{c3} was removed and former \code{c1}, \code{c2} were renamed to \code{c1_OR_(c3_COMB_c2)} and \code{c2_OR_(c3_COMB_c1)}, respectively.
+}
 }
 \description{
-This function first removes empty columns. Then it discovers linear dependent columns, then renames and removes columns to make the matrix full rank.
+This function first removes empty columns. Then it discovers linear dependent columns, then removes and renames columns to make the matrix full rank.
 }
 \examples{
 c1 <- rbinom(10, 1, .4)
@@ -23,6 +28,8 @@ c2 <- 1-c1
 c3 <- integer(10)
 c4 <- c1
 c5 <- 2*c2
+c6 <- rbinom(10, 1, .8)
+c7 <- c5+c6
 mat <- as.matrix(data.frame(c1, c2, c3, c4, c5))
 make_full_rank_matrix(mat)
 mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
