@@ -1,0 +1,5 @@
+^renv$
+^renv\.lock$
+^fullRankMatrix\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
