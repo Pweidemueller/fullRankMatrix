@@ -30,7 +30,7 @@ c4 <- c1
 c5 <- 2*c2
 c6 <- rbinom(10, 1, .8)
 c7 <- c5+c6
-mat <- as.matrix(data.frame(c1, c2, c3, c4, c5))
+mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
 make_full_rank_matrix(mat)
 mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
 }
