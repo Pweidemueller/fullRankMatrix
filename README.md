@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of fullRankMatrix is to remove empty columns (contain only
+The goal of `fullRankMatrix` is to remove empty columns (contain only
 0’s), merge duplicated columns and merge linearly dependent columns.
 These operations will create a matrix of full rank. The changes made to
 the columns are reflected in the column headers interpretability if the
@@ -62,24 +62,24 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -1.481e+00  1.481e+00  6.032e-01 -6.032e-01 -4.326e-01  4.326e-01 -4.441e-16 
+#>  2.602e+00 -2.602e+00  1.304e+00 -1.304e+00  1.012e+00 -1.012e+00 -4.441e-16 
 #>          8          9         10 
-#>  8.082e-01  1.938e-01 -1.002e+00 
+#>  8.907e-01  8.004e-01 -1.691e+00 
 #> 
 #> Coefficients: (1 not defined because of singularities)
-#>               Estimate Std. Error t value Pr(>|t|)    
-#> matstrawberry   8.9120     0.8477  10.513 0.000134 ***
-#> matapple        5.1225     0.8477   6.043 0.001788 ** 
-#> matpear        -0.4284     1.6232  -0.264 0.802367    
-#> matspring       2.2667     1.1988   1.891 0.117231    
-#> matsummer           NA         NA      NA       NA    
-#> matfall         1.8428     1.4682   1.255 0.264895    
+#>               Estimate Std. Error t value Pr(>|t|)   
+#> matstrawberry   10.010      1.526   6.560  0.00123 **
+#> matapple         5.088      1.526   3.334  0.02068 * 
+#> matpear         -1.571      2.922  -0.537  0.61398   
+#> matspring        1.760      2.158   0.816  0.45172   
+#> matsummer           NA         NA      NA       NA   
+#> matfall          2.955      2.643   1.118  0.31431   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.199 on 5 degrees of freedom
-#> Multiple R-squared:  0.9863, Adjusted R-squared:  0.9725 
-#> F-statistic: 71.78 on 5 and 5 DF,  p-value: 0.0001185
+#> Residual standard error: 2.158 on 5 degrees of freedom
+#> Multiple R-squared:  0.9626, Adjusted R-squared:  0.9252 
+#> F-statistic: 25.76 on 5 and 5 DF,  p-value: 0.001409
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
@@ -97,7 +97,7 @@ model has no way of recovering which one given these 10 examples.
 
 To make such cases more obvious we wrote `fullRankMatrix`, it removes
 linearly dependent columns and renames the remaining columns to make the
-dependencies clear.
+dependencies clear using the `make_full_rank_matrix()` function.
 
 ``` r
 library(fullRankMatrix)
@@ -136,29 +136,23 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -1.481e+00  1.481e+00  6.032e-01 -6.032e-01 -4.326e-01  4.326e-01 -4.441e-16 
+#>  2.602e+00 -2.602e+00  1.304e+00 -1.304e+00  1.012e+00 -1.012e+00 -4.441e-16 
 #>          8          9         10 
-#>  8.082e-01  1.938e-01 -1.002e+00 
+#>  8.907e-01  8.004e-01 -1.691e+00 
 #> 
 #> Coefficients:
-#>                                         Estimate Std. Error t value Pr(>|t|)
-#> mat_frstrawberry_OR_(summer_COMB_apple)   8.9120     0.8477  10.513 0.000134
-#> mat_frapple_OR_(summer_COMB_strawberry)   5.1225     0.8477   6.043 0.001788
-#> mat_frpear                               -0.4284     1.6232  -0.264 0.802367
-#> mat_frspring                              2.2667     1.1988   1.891 0.117231
-#> mat_frfall                                1.8428     1.4682   1.255 0.264895
-#>                                            
-#> mat_frstrawberry_OR_(summer_COMB_apple) ***
-#> mat_frapple_OR_(summer_COMB_strawberry) ** 
-#> mat_frpear                                 
-#> mat_frspring                               
-#> mat_frfall                                 
+#>                                         Estimate Std. Error t value Pr(>|t|)   
+#> mat_frstrawberry_OR_(summer_COMB_apple)   10.010      1.526   6.560  0.00123 **
+#> mat_frapple_OR_(summer_COMB_strawberry)    5.088      1.526   3.334  0.02068 * 
+#> mat_frpear                                -1.571      2.922  -0.537  0.61398   
+#> mat_frspring                               1.760      2.158   0.816  0.45172   
+#> mat_frfall                                 2.955      2.643   1.118  0.31431   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.199 on 5 degrees of freedom
-#> Multiple R-squared:  0.9863, Adjusted R-squared:  0.9725 
-#> F-statistic: 71.78 on 5 and 5 DF,  p-value: 0.0001185
+#> Residual standard error: 2.158 on 5 degrees of freedom
+#> Multiple R-squared:  0.9626, Adjusted R-squared:  0.9252 
+#> F-statistic: 25.76 on 5 and 5 DF,  p-value: 0.001409
 ```
 
 You can see that there are no more undefined coefficients, since the
@@ -174,9 +168,10 @@ There are already a few other packages out there that offer functions to
 detect linear dependent columns. Here are the ones we are aware of:
 
 **`caret::findLinearCombos()`**:
-<https://rdrr.io/cran/caret/man/findLinearCombos.html> This function is
-used by `fullRankMatrix` as it identifies which columns are linearly
-dependent and suggests which columns to remove.
+<https://rdrr.io/cran/caret/man/findLinearCombos.html>
+
+This function is used by `fullRankMatrix` as it identifies which columns
+are linearly dependent and suggests which columns to remove.
 
 ``` r
 caret::findLinearCombos(mat)
@@ -190,9 +185,10 @@ caret::findLinearCombos(mat)
 ```
 
 **`WeightIt::make_full_rank()`**:
-<https://rdrr.io/cran/WeightIt/man/make_full_rank.html> This function
-removes linearly dependent columns, but doesn’t rename the remaining
-columns accordingly.
+<https://rdrr.io/cran/WeightIt/man/make_full_rank.html>
+
+This function removes linearly dependent columns, but doesn’t rename the
+remaining columns accordingly.
 
 ``` r
 WeightIt::make_full_rank(mat, with.intercept = FALSE)
@@ -210,8 +206,9 @@ WeightIt::make_full_rank(mat, with.intercept = FALSE)
 ```
 
 **`plm::detect.lindep()`:**
-<https://rdrr.io/cran/plm/man/detect.lindep.html> The function returns
-which columns are potentially linearly dependent.
+<https://rdrr.io/cran/plm/man/detect.lindep.html>
+
+The function returns which columns are potentially linearly dependent.
 
 ``` r
 plm::detect.lindep(mat)
@@ -243,25 +240,26 @@ plm::detect.lindep(mat_test)
 make_full_rank_matrix(mat_test)
 #>       (c1_AND_c4) c2_OR_(c5)_OR_(c7_COMB_c6) c6_OR_(c7_COMB_c2)
 #>  [1,]           0                          1                  1
-#>  [2,]           0                          1                  0
-#>  [3,]           0                          1                  1
-#>  [4,]           1                          0                  1
+#>  [2,]           1                          0                  1
+#>  [3,]           1                          0                  1
+#>  [4,]           0                          1                  1
 #>  [5,]           0                          1                  1
-#>  [6,]           1                          0                  0
-#>  [7,]           0                          1                  0
-#>  [8,]           0                          1                  0
-#>  [9,]           1                          0                  1
-#> [10,]           0                          1                  1
+#>  [6,]           0                          1                  0
+#>  [7,]           1                          0                  1
+#>  [8,]           1                          0                  1
+#>  [9,]           0                          1                  0
+#> [10,]           1                          0                  1
 ```
 
 **`Smisc::findDepMat()`**:
 <https://rdrr.io/cran/Smisc/man/findDepMat.html>
 
 This function indicates linearly dependent rows/columns, but it doesn’t
-state which rows/columns are linearly dependent with each other. \*
-however, this function seems to not work well for one-hot encoded
-matrices and the package doesn’t seem to be updated anymore (s. this
-issue: <https://github.com/pnnl/Smisc/issues/24>).
+state which rows/columns are linearly dependent with each other.
+
+-   However, this function seems to not work well for one-hot encoded
+    matrices and the package doesn’t seem to be updated anymore (s. this
+    issue: <https://github.com/pnnl/Smisc/issues/24>).
 
 ``` r
 # example provided by Smisc documentation

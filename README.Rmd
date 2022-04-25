@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of fullRankMatrix is to remove empty columns (contain only 0's), merge duplicated columns and merge linearly dependent columns. These operations will create a matrix of full rank. The changes made to the columns are reflected in the column headers interpretability if the matrix is used in e.g. a linear model fit.
+The goal of `fullRankMatrix` is to remove empty columns (contain only 0's), merge duplicated columns and merge linearly dependent columns. These operations will create a matrix of full rank. The changes made to the columns are reflected in the column headers interpretability if the matrix is used in e.g. a linear model fit.
 
 ## Installation
 
@@ -64,7 +64,7 @@ So if you would just look at the coefficients and not consider the `NA` further,
 
 However, when you look at the model matrix you can see that `summer` is a linear combination of `strawberry` and `apple`. So truly any of the three factors could contribute to the sweetness of a fruit, the linear model has no way of recovering which one given these 10 examples. 
 
-To make such cases more obvious we wrote `fullRankMatrix`, it removes linearly dependent columns and renames the remaining columns to make the dependencies clear.
+To make such cases more obvious we wrote `fullRankMatrix`, it removes linearly dependent columns and renames the remaining columns to make the dependencies clear using the `make_full_rank_matrix()` function.
 
 ```{r}
 library(fullRankMatrix)
@@ -82,16 +82,19 @@ You can see that there are no more undefined coefficients, since the coefficient
 There are already a few other packages out there that offer functions to detect linear dependent columns. Here are the ones we are aware of:
 
 **`caret::findLinearCombos()`**: https://rdrr.io/cran/caret/man/findLinearCombos.html
+
 This function is used by `fullRankMatrix` as it identifies which columns are linearly dependent and suggests which columns to remove.
 ```{r}
 caret::findLinearCombos(mat)
 ```
 **`WeightIt::make_full_rank()`**: https://rdrr.io/cran/WeightIt/man/make_full_rank.html
+
 This function removes linearly dependent columns, but doesn't rename the remaining columns accordingly.
 ```{r}
 WeightIt::make_full_rank(mat, with.intercept = FALSE)
 ```
 **`plm::detect.lindep()`:** https://rdrr.io/cran/plm/man/detect.lindep.html
+
 The function returns which columns are potentially linearly dependent.
 ```{r}
 plm::detect.lindep(mat)
@@ -118,7 +121,8 @@ make_full_rank_matrix(mat_test)
 **`Smisc::findDepMat()`**: https://rdrr.io/cran/Smisc/man/findDepMat.html
 
 This function indicates linearly dependent rows/columns, but it doesn't state which rows/columns are linearly dependent with each other.
-* however, this function seems to not work well for one-hot encoded matrices and the package doesn't seem to be updated anymore (s. this issue: https://github.com/pnnl/Smisc/issues/24).
+
+- However, this function seems to not work well for one-hot encoded matrices and the package doesn't seem to be updated anymore (s. this issue: https://github.com/pnnl/Smisc/issues/24).
 ```{r}
 # example provided by Smisc documentation
 Y <- matrix(c(1, 3, 4,
