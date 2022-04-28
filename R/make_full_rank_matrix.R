@@ -45,7 +45,7 @@ remove_empty_columns <- function(mat, verbose=FALSE) {
   mat_red <- mat[, !emptry_col]
   if (verbose){
     print(sprintf("The matrix after removing empty columns contains %i rows and %i columns",
-                  dim(mat_red)[1], dim(mat_red)[2]))
+                  nrow(mat_red), ncol(mat_red)))
 
   }
   return(mat_red)
@@ -72,7 +72,7 @@ merge_duplicated <- function(mat, verbose=FALSE) {
   colnames(mat_unique) <- colnames_unique
   if (verbose){
     print(sprintf("The matrix after merging duplicate columns contains %i rows and %i columns.",
-                  dim(mat_unique)[1], dim(mat_unique)[2]))
+                  nrow(mat_unique), ncol(mat_unique)))
   }
   return(mat_unique)
 }
@@ -98,7 +98,7 @@ find_lindependent_coef <- function(mat, verbose=FALSE) {
   mat_red <- mat[, -linear_combs$remove, drop=FALSE]
   if (verbose){
     print(sprintf("The matrix after finding linearly dependent columns contains %i rows and %i columns.",
-                  dim(mat_red)[1], dim(mat_red)[2]))
+                  nrow(mat_red), ncol(mat_red)))
   }
   return(mat_red)
 }
