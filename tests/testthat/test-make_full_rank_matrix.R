@@ -1,3 +1,13 @@
+test_that("check that a full rank matrix is returned unchanged", {
+  
+  df <- data.frame(col = sample(letters[1:3], 10, replace = 20))
+  mat <- model.matrix(~ col - 1, data = df)  
+  mat2 <- make_full_rank_matrix(mat)
+  expect_equal(mat, mat2)
+  
+})
+
+
 test_that("removing empty columns as expected", {
   set.seed(1000)
   c1 <- rbinom(10, 1, .4)
