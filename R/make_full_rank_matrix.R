@@ -39,9 +39,9 @@ make_full_rank_matrix <- function(mat, verbose=FALSE){
   return(mat_mod)
 }
 
-remove_empty_columns <- function(mat, verbose=FALSE) {
-  emptry_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(x==0)})
-  mat_red <- mat[, !emptry_col]
+remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
+  empty_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(abs(x) < tol)})
+  mat_red <- mat[, !empty_col]
   if (verbose){
     print(sprintf("The matrix after removing empty columns contains %i rows and %i columns",
                   nrow(mat_red), ncol(mat_red)))
