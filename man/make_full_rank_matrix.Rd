@@ -14,9 +14,8 @@ make_full_rank_matrix(mat, verbose = FALSE)
 \value{
 A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 \itemize{
-\item \code{(c1_AND_c2)}: column \code{c2} was removed because it was the same as column \code{c1}. Former \code{c1} was renamed to \code{(c1_AND_c2)}
-\item \code{c1_OR_(c2)}: column \code{c2} was removed because it was linearly dependent with \code{c1} (e.g. multiple of). Former \code{c1} was renamed to \code{c1_OR_(c2)}
-\item \code{c1_OR_(c3_COMB_c2)}: columns \code{c1}, \code{c2} and \code{c3} are linearly dependent of each other. In this example \code{c3} was removed and former \code{c1}, \code{c2} were renamed to \code{c1_OR_(c3_COMB_c2)} and \code{c2_OR_(c3_COMB_c1)}, respectively.
+\item \code{(c1_AND_c2)} If multiple columns are exactly identical, only a single instance is retained.
+Its column name lists the names of the columns that were collapsed into one.
 }
 }
 \description{

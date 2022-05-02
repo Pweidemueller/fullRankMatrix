@@ -4,7 +4,7 @@
 \alias{find_linear_dependent_columns}
 \title{Find linear dependent columns in a matrix}
 \usage{
-find_linear_dependent_columns(mat, tol = 1e-06)
+find_linear_dependent_columns(mat, tol = 1e-12)
 }
 \arguments{
 \item{mat}{a matrix}
@@ -21,7 +21,7 @@ Find linear dependent columns in a matrix
   mat <- matrix(rnorm(3 * 10), nrow = 10, ncol = 3)
   mat <- cbind(mat, mat[,1] + 0.5 * mat[,3])
   find_linear_dependent_columns(mat)  # returns list(c(1,3,4))
-  
+
 }
 \seealso{
 The algorithm and function is inspired by the \code{internalEnumLC}

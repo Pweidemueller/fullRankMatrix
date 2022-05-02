@@ -62,31 +62,31 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#>  2.602e+00 -2.602e+00  1.304e+00 -1.304e+00  1.012e+00 -1.012e+00 -4.441e-16 
+#> -1.632e+00  1.632e+00  2.102e+00 -2.102e+00 -4.448e-01  4.448e-01 -8.882e-16 
 #>          8          9         10 
-#>  8.907e-01  8.004e-01 -1.691e+00 
+#>  1.014e+00 -1.935e+00  9.215e-01 
 #> 
 #> Coefficients: (1 not defined because of singularities)
 #>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry   10.010      1.526   6.560  0.00123 **
-#> matapple         5.088      1.526   3.334  0.02068 * 
-#> matpear         -1.571      2.922  -0.537  0.61398   
-#> matspring        1.760      2.158   0.816  0.45172   
+#> matstrawberry   9.1171     1.4207   6.417  0.00136 **
+#> matapple        5.8240     1.4207   4.099  0.00936 **
+#> matpear         1.6589     2.7204   0.610  0.56864   
+#> matspring       2.7263     2.0092   1.357  0.23285   
 #> matsummer           NA         NA      NA       NA   
-#> matfall          2.955      2.643   1.118  0.31431   
+#> matfall        -0.8377     2.4607  -0.340  0.74738   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.158 on 5 degrees of freedom
-#> Multiple R-squared:  0.9626, Adjusted R-squared:  0.9252 
-#> F-statistic: 25.76 on 5 and 5 DF,  p-value: 0.001409
+#> Residual standard error: 2.009 on 5 degrees of freedom
+#> Multiple R-squared:  0.9641, Adjusted R-squared:  0.9281 
+#> F-statistic: 26.83 on 5 and 5 DF,  p-value: 0.001279
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
 (`matsummer` is not defined) but it doesn’t indicate what columns it is
 linearly dependent with.
 
-So if you would just look at the coefficients and not consider the `NA`
+So if you would just look at the columns and not consider the `NA`
 further, you would interpret that `strawberry`, `apple` and `spring`
 make fruit sweet.
 
@@ -103,28 +103,28 @@ dependencies clear using the `make_full_rank_matrix()` function.
 library(fullRankMatrix)
 mat_fr <- make_full_rank_matrix(mat)
 mat_fr
-#>       strawberry_OR_(summer_COMB_apple) apple_OR_(summer_COMB_strawberry) pear
-#>  [1,]                                 1                                 0    0
-#>  [2,]                                 1                                 0    0
-#>  [3,]                                 1                                 0    0
-#>  [4,]                                 1                                 0    0
-#>  [5,]                                 0                                 1    0
-#>  [6,]                                 0                                 1    0
-#>  [7,]                                 0                                 1    0
-#>  [8,]                                 0                                 0    1
-#>  [9,]                                 0                                 0    1
-#> [10,]                                 0                                 0    1
-#>       spring fall
-#>  [1,]      1    0
-#>  [2,]      1    0
-#>  [3,]      0    0
-#>  [4,]      0    0
-#>  [5,]      0    0
-#>  [6,]      0    0
-#>  [7,]      0    1
-#>  [8,]      0    1
-#>  [9,]      0    1
-#> [10,]      0    1
+#>       pear spring fall SPACE(strawberry,apple,summer)_AXIS1
+#>  [1,]    0      1    0                                 -0.5
+#>  [2,]    0      1    0                                 -0.5
+#>  [3,]    0      0    0                                 -0.5
+#>  [4,]    0      0    0                                 -0.5
+#>  [5,]    0      0    0                                  0.0
+#>  [6,]    0      0    0                                  0.0
+#>  [7,]    0      0    1                                  0.0
+#>  [8,]    1      0    1                                  0.0
+#>  [9,]    1      0    1                                  0.0
+#> [10,]    1      0    1                                  0.0
+#>       SPACE(strawberry,apple,summer)_AXIS2
+#>  [1,]                            0.0000000
+#>  [2,]                            0.0000000
+#>  [3,]                            0.0000000
+#>  [4,]                            0.0000000
+#>  [5,]                           -0.5773503
+#>  [6,]                           -0.5773503
+#>  [7,]                           -0.5773503
+#>  [8,]                            0.0000000
+#>  [9,]                            0.0000000
+#> [10,]                            0.0000000
 ```
 
 ``` r
@@ -136,31 +136,41 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#>  2.602e+00 -2.602e+00  1.304e+00 -1.304e+00  1.012e+00 -1.012e+00 -4.441e-16 
+#> -1.632e+00  1.632e+00  2.102e+00 -2.102e+00 -4.448e-01  4.448e-01  8.882e-16 
 #>          8          9         10 
-#>  8.907e-01  8.004e-01 -1.691e+00 
+#>  1.014e+00 -1.935e+00  9.215e-01 
 #> 
 #> Coefficients:
-#>                                         Estimate Std. Error t value Pr(>|t|)   
-#> mat_frstrawberry_OR_(summer_COMB_apple)   10.010      1.526   6.560  0.00123 **
-#> mat_frapple_OR_(summer_COMB_strawberry)    5.088      1.526   3.334  0.02068 * 
-#> mat_frpear                                -1.571      2.922  -0.537  0.61398   
-#> mat_frspring                               1.760      2.158   0.816  0.45172   
-#> mat_frfall                                 2.955      2.643   1.118  0.31431   
+#>                                            Estimate Std. Error t value Pr(>|t|)
+#> mat_frpear                                   1.6589     2.7204   0.610  0.56864
+#> mat_frspring                                 2.7263     2.0092   1.357  0.23285
+#> mat_frfall                                  -0.8377     2.4607  -0.340  0.74738
+#> mat_frSPACE(strawberry,apple,summer)_AXIS1 -18.2342     2.8414  -6.417  0.00136
+#> mat_frSPACE(strawberry,apple,summer)_AXIS2 -10.0875     2.4607  -4.099  0.00936
+#>                                              
+#> mat_frpear                                   
+#> mat_frspring                                 
+#> mat_frfall                                   
+#> mat_frSPACE(strawberry,apple,summer)_AXIS1 **
+#> mat_frSPACE(strawberry,apple,summer)_AXIS2 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.158 on 5 degrees of freedom
-#> Multiple R-squared:  0.9626, Adjusted R-squared:  0.9252 
-#> F-statistic: 25.76 on 5 and 5 DF,  p-value: 0.001409
+#> Residual standard error: 2.009 on 5 degrees of freedom
+#> Multiple R-squared:  0.9641, Adjusted R-squared:  0.9281 
+#> F-statistic: 26.83 on 5 and 5 DF,  p-value: 0.001279
 ```
 
-You can see that there are no more undefined coefficients, since the
-coefficient `summer` was removed. Coefficient `strawberry` was renamed
-to indicate that either `strawberry` could make the fruit sweet or it
-could be a combination of `apple` in `summer`
-(`strawberry_OR_(summer_COMB_apple)`). Vice versa `apple` was renamed to
-`apple_OR_(summer_COMB_strawberry)` to indicate this dependency.
+You can see that there are no more undefined columns, since the column
+`summer` was removed. The three columns `strawberry`, `apple` and
+`summer` have now been replaced with two orthogonal (linearly
+independent) columns called `SPACE(strawberry,apple,summer)_AXIS1` and
+`SPACE(strawberry,apple,summer)_AXIS2` to indicate that a combination of
+all three variables (`strawberry`, `apple`, `summer`) could make the
+fruit sweet. A further resolution which of the three variables is most
+strongly associated with `sweetness` is not possible with the given
+number of observations, but there is definitely an association of
+`sweetness` with the space spanned by the three variables.
 
 ### Other available packages that detect linear dependent columns
 
@@ -238,17 +248,28 @@ plm::detect.lindep(mat_test)
 
 ``` r
 make_full_rank_matrix(mat_test)
-#>       (c1_AND_c4) c2_OR_(c5)_OR_(c7_COMB_c6) c6_OR_(c7_COMB_c2)
-#>  [1,]           0                          1                  1
-#>  [2,]           1                          0                  1
-#>  [3,]           1                          0                  1
-#>  [4,]           0                          1                  1
-#>  [5,]           0                          1                  1
-#>  [6,]           0                          1                  0
-#>  [7,]           1                          0                  1
-#>  [8,]           1                          0                  1
-#>  [9,]           0                          1                  0
-#> [10,]           1                          0                  1
+#>       SPACE((c1_AND_c4),c6,c7)_AXIS1
+#>  [1,]                      0.0000000
+#>  [2,]                     -0.4472136
+#>  [3,]                      0.0000000
+#>  [4,]                     -0.4472136
+#>  [5,]                     -0.4472136
+#>  [6,]                      0.0000000
+#>  [7,]                      0.0000000
+#>  [8,]                     -0.4472136
+#>  [9,]                     -0.4472136
+#> [10,]                      0.0000000
+#>       SPACE(SPACE(c2,c5)_AXIS1,SPACE((c1_AND_c4),c6,c7)_AXIS2)_AXIS1
+#>  [1,]                                                     -0.4472136
+#>  [2,]                                                      0.0000000
+#>  [3,]                                                     -0.4472136
+#>  [4,]                                                      0.0000000
+#>  [5,]                                                      0.0000000
+#>  [6,]                                                     -0.4472136
+#>  [7,]                                                     -0.4472136
+#>  [8,]                                                      0.0000000
+#>  [9,]                                                      0.0000000
+#> [10,]                                                     -0.4472136
 ```
 
 **`Smisc::findDepMat()`**:

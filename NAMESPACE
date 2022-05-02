@@ -2,3 +2,4 @@
 
 export(find_linear_dependent_columns)
 export(make_full_rank_matrix)
+importFrom(stats,lm.fit)

@@ -6,7 +6,7 @@
 #' @param verbose Print how column numbers change with each operation.
 #'
 #' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
-#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained. 
+#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
 #'   Its column name lists the names of the columns that were collapsed into one.
 #' @export
 #'
@@ -30,7 +30,7 @@ make_full_rank_matrix <- function(mat, verbose=FALSE){
   }
   mat_mod <- remove_empty_columns(mat, verbose=verbose)
   mat_mod <- merge_duplicated(mat_mod, verbose=verbose)
-  mat_mod <- find_lindependent_coef(mat_mod, verbose=verbose)
+  mat_mod <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose)
   if (ncol(mat_mod) > qr(mat)$rank){
     stop(print("The modified matrix still has more columns than implied by rank. Check manually why modified matrix is not full rank after applying make_full_rank_matrix()."))
   }
@@ -106,7 +106,7 @@ merge_duplicated <- function(mat, verbose=FALSE) {
 collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
   stopifnot(is.matrix(mat))
   validate_column_names(colnames(mat))
-  
+
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
   while(length(linear_dependencies) != 0){
     dependent_set <- linear_dependencies[[1]]
@@ -115,15 +115,19 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
     qr_space <- qr(dependent_columns)
     rank_of_set <- qr_space$rank
     new_space <- qr.Q(qr_space)[,seq_len(rank_of_set),drop=FALSE]
-    
+
     # Handle names
     new_names <- paste0("SPACE(", paste0(colnames(dependent_columns), collapse = ",") ,")_AXIS", seq_len(rank_of_set))
     colnames(new_space) <- new_names
     mat <- cbind(mat, new_space)
-    
+
     # Changing the matrix could introduce new dependencies
     linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
   }
-  mat  
+  if (verbose){
+        print(sprintf("The matrix after collapsing linearly dependent columns contains %i rows and %i columns.",
+                      nrow(mat), ncol(mat)))
+      }
+  mat
 }
 

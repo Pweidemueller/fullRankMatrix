@@ -60,7 +60,7 @@ print(summary(fit))
 ```
 As you can see `lm` realizes that there are linearly dependent columns (`matsummer` is not defined) but it doesn't indicate what columns it is linearly dependent with.
 
-So if you would just look at the coefficients and not consider the `NA` further, you would interpret that `strawberry`, `apple` and `spring` make fruit sweet.
+So if you would just look at the columns and not consider the `NA` further, you would interpret that `strawberry`, `apple` and `spring` make fruit sweet.
 
 However, when you look at the model matrix you can see that `summer` is a linear combination of `strawberry` and `apple`. So truly any of the three factors could contribute to the sweetness of a fruit, the linear model has no way of recovering which one given these 10 examples. 
 
@@ -76,7 +76,7 @@ mat_fr
 fit <- lm(sweetness ~ mat_fr + 0)
 print(summary(fit))
 ```
-You can see that there are no more undefined coefficients, since the coefficient `summer` was removed. Coefficient `strawberry` was renamed to indicate that either `strawberry` could make the fruit sweet or it could be a combination of `apple` in `summer` (`strawberry_OR_(summer_COMB_apple)`). Vice versa `apple` was renamed to `apple_OR_(summer_COMB_strawberry)` to indicate this dependency.
+You can see that there are no more undefined columns, since the column `summer` was removed. The three columns `strawberry`, `apple` and `summer` have now been replaced with two orthogonal (linearly independent) columns called `SPACE(strawberry,apple,summer)_AXIS1` and `SPACE(strawberry,apple,summer)_AXIS2` to indicate that a combination of all three variables (`strawberry`, `apple`, `summer`) could make the fruit sweet. A further resolution which of the three variables is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three variables.
 
 ### Other available packages that detect linear dependent columns
 There are already a few other packages out there that offer functions to detect linear dependent columns. Here are the ones we are aware of:
