@@ -35,7 +35,7 @@ make_full_rank_matrix <- function(mat, verbose=FALSE){
     stop(print("The modified matrix still has more columns than implied by rank. Check manually why modified matrix is not full rank after applying make_full_rank_matrix()."))
   }
   if (verbose){
-    print("The matrix is full rank now.")
+    print("The matrix is now full rank.")
   }
   return(mat_mod)
 }
@@ -44,17 +44,15 @@ remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
   empty_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(abs(x) < tol)})
   mat_red <- mat[, !empty_col]
   if (verbose){
-    print(sprintf("The matrix after removing empty columns contains %i rows and %i columns",
-                  nrow(mat_red), ncol(mat_red)))
+    print(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
+                  sum(empty_col, na.rm = TRUE), ncol(mat_red)))
 
   }
   return(mat_red)
 }
 
 merge_duplicated <- function(mat, verbose=FALSE) {
-  if (is.matrix(mat)==FALSE){
-    stop(print("Input matrix has to be of type matrix. If your matrix is stored as a dataframe, convert like so: `mat <- as.matrix(mat)`."))
-  }
+  stopifnot(is.matrix(mat))
   mat_unique <- unique(mat, MARGIN = 2)
   mat_duplicated <- mat[, duplicated(mat, MARGIN = 2), drop=FALSE]
   colnames_unique <- colnames(mat_unique)
@@ -71,37 +69,11 @@ merge_duplicated <- function(mat, verbose=FALSE) {
   }
   colnames(mat_unique) <- colnames_unique
   if (verbose){
-    print(sprintf("The matrix after merging duplicate columns contains %i rows and %i columns.",
-                  nrow(mat_unique), ncol(mat_unique)))
+    print(sprintf("%i duplicated columns were detected. After merging duplicated columns the matrix contains %i columns.",
+                  length(colnames_duplicated), ncol(mat_unique)))
   }
   return(mat_unique)
 }
-
-# find_lindependent_coef <- function(mat, verbose=FALSE) {
-#   if (is.matrix(mat)==FALSE){
-#     stop(print("Input matrix has to be of type matrix. If your matrix is stored as a dataframe, convert like so: `mat <- as.matrix(mat)`."))
-#   }
-#   linear_combs <- caret::findLinearCombos(mat)[c("linearCombos", "remove")]
-#   colnames_matr <- colnames(mat)
-#   new_colnames <- colnames_matr
-#   for (ncombo in seq_len(length(linear_combs$linearCombos))){
-#     combo <- linear_combs$linearCombos[[ncombo]]
-#     remove <- linear_combs$remove[[ncombo]]
-#     keep <- combo[combo!=remove]
-#     for (keep_col in keep){
-#       add_names <- c(colnames_matr[remove], colnames_matr[keep[keep!=keep_col]])
-#       add_names <- paste(add_names, collapse="_COMB_")
-#       new_colnames[keep_col] = paste0(new_colnames[keep_col], "_OR_(", add_names, ")")
-#     }
-#   }
-#   colnames(mat) <- new_colnames
-#   mat_red <- mat[, -linear_combs$remove, drop=FALSE]
-#   if (verbose){
-#     print(sprintf("The matrix after finding linearly dependent columns contains %i rows and %i columns.",
-#                   nrow(mat_red), ncol(mat_red)))
-#   }
-#   return(mat_red)
-# }
 
 collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
   stopifnot(is.matrix(mat))
