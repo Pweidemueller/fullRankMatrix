@@ -6,9 +6,8 @@
 #' @param verbose Print how column numbers change with each operation.
 #'
 #' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
-#'    * `(c1_AND_c2)`: column `c2` was removed because it was the same as column `c1`. Former `c1` was renamed to `(c1_AND_c2)`
-#'    * `c1_OR_(c2)`: column `c2` was removed because it was linearly dependent with `c1` (e.g. multiple of). Former `c1` was renamed to `c1_OR_(c2)`
-#'    * `c1_OR_(c3_COMB_c2)`: columns `c1`, `c2` and `c3` are linearly dependent of each other. In this example `c3` was removed and former `c1`, `c2` were renamed to `c1_OR_(c3_COMB_c2)` and `c2_OR_(c3_COMB_c1)`, respectively.
+#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained. 
+#'   Its column name lists the names of the columns that were collapsed into one.
 #' @export
 #'
 #' @examples
