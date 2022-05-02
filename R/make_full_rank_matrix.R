@@ -6,9 +6,8 @@
 #' @param verbose Print how column numbers change with each operation.
 #'
 #' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
-#'    * `(c1_AND_c2)`: column `c2` was removed because it was the same as column `c1`. Former `c1` was renamed to `(c1_AND_c2)`
-#'    * `c1_OR_(c2)`: column `c2` was removed because it was linearly dependent with `c1` (e.g. multiple of). Former `c1` was renamed to `c1_OR_(c2)`
-#'    * `c1_OR_(c3_COMB_c2)`: columns `c1`, `c2` and `c3` are linearly dependent of each other. In this example `c3` was removed and former `c1`, `c2` were renamed to `c1_OR_(c3_COMB_c2)` and `c2_OR_(c3_COMB_c1)`, respectively.
+#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained. 
+#'   Its column name lists the names of the columns that were collapsed into one.
 #' @export
 #'
 #' @examples
@@ -40,9 +39,9 @@ make_full_rank_matrix <- function(mat, verbose=FALSE){
   return(mat_mod)
 }
 
-remove_empty_columns <- function(mat, verbose=FALSE) {
-  emptry_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(x==0)})
-  mat_red <- mat[, !emptry_col]
+remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
+  empty_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(abs(x) < tol)})
+  mat_red <- mat[, !empty_col]
   if (verbose){
     print(sprintf("The matrix after removing empty columns contains %i rows and %i columns",
                   nrow(mat_red), ncol(mat_red)))
