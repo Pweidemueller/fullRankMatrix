@@ -24,6 +24,7 @@
 #' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
 
 make_full_rank_matrix <- function(mat, verbose=FALSE){
+  validate_column_names(colnames(mat))
   if (verbose){
     print(sprintf("The original matrix contains %i rows and %i columns. The matrix has rank %i.",
                   dim(mat)[1], dim(mat)[2], qr(mat)$rank))
