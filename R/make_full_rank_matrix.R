@@ -23,6 +23,7 @@
 #' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
 
 make_full_rank_matrix <- function(mat, verbose=FALSE){
+  validate_column_names(colnames(mat))
   if (verbose){
     print(sprintf("The original matrix contains %i rows and %i columns. The matrix has rank %i.",
                   dim(mat)[1], dim(mat)[2], qr(mat)$rank))
@@ -76,28 +77,53 @@ merge_duplicated <- function(mat, verbose=FALSE) {
   return(mat_unique)
 }
 
-find_lindependent_coef <- function(mat, verbose=FALSE) {
-  if (is.matrix(mat)==FALSE){
-    stop(print("Input matrix has to be of type matrix. If your matrix is stored as a dataframe, convert like so: `mat <- as.matrix(mat)`."))
+# find_lindependent_coef <- function(mat, verbose=FALSE) {
+#   if (is.matrix(mat)==FALSE){
+#     stop(print("Input matrix has to be of type matrix. If your matrix is stored as a dataframe, convert like so: `mat <- as.matrix(mat)`."))
+#   }
+#   linear_combs <- caret::findLinearCombos(mat)[c("linearCombos", "remove")]
+#   colnames_matr <- colnames(mat)
+#   new_colnames <- colnames_matr
+#   for (ncombo in seq_len(length(linear_combs$linearCombos))){
+#     combo <- linear_combs$linearCombos[[ncombo]]
+#     remove <- linear_combs$remove[[ncombo]]
+#     keep <- combo[combo!=remove]
+#     for (keep_col in keep){
+#       add_names <- c(colnames_matr[remove], colnames_matr[keep[keep!=keep_col]])
+#       add_names <- paste(add_names, collapse="_COMB_")
+#       new_colnames[keep_col] = paste0(new_colnames[keep_col], "_OR_(", add_names, ")")
+#     }
+#   }
+#   colnames(mat) <- new_colnames
+#   mat_red <- mat[, -linear_combs$remove, drop=FALSE]
+#   if (verbose){
+#     print(sprintf("The matrix after finding linearly dependent columns contains %i rows and %i columns.",
+#                   nrow(mat_red), ncol(mat_red)))
+#   }
+#   return(mat_red)
+# }
+
+collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
+  stopifnot(is.matrix(mat))
+  validate_column_names(colnames(mat))
+  
+  linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
+  while(length(linear_dependencies) != 0){
+    dependent_set <- linear_dependencies[[1]]
+    dependent_columns <- mat[,dependent_set,drop=FALSE]
+    mat <- mat[,-dependent_set,drop=FALSE]
+    qr_space <- qr(dependent_columns)
+    rank_of_set <- qr_space$rank
+    new_space <- qr.Q(qr_space)[,seq_len(rank_of_set),drop=FALSE]
+    
+    # Handle names
+    new_names <- paste0("SPACE(", paste0(colnames(dependent_columns), collapse = ",") ,")_AXIS", seq_len(rank_of_set))
+    colnames(new_space) <- new_names
+    mat <- cbind(mat, new_space)
+    
+    # Changing the matrix could introduce new dependencies
+    linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
   }
-  linear_combs <- caret::findLinearCombos(mat)[c("linearCombos", "remove")]
-  colnames_matr <- colnames(mat)
-  new_colnames <- colnames_matr
-  for (ncombo in seq_len(length(linear_combs$linearCombos))){
-    combo <- linear_combs$linearCombos[[ncombo]]
-    remove <- linear_combs$remove[[ncombo]]
-    keep <- combo[combo!=remove]
-    for (keep_col in keep){
-      add_names <- c(colnames_matr[remove], colnames_matr[keep[keep!=keep_col]])
-      add_names <- paste(add_names, collapse="_COMB_")
-      new_colnames[keep_col] = paste0(new_colnames[keep_col], "_OR_(", add_names, ")")
-    }
-  }
-  colnames(mat) <- new_colnames
-  mat_red <- mat[, -linear_combs$remove, drop=FALSE]
-  if (verbose){
-    print(sprintf("The matrix after finding linearly dependent columns contains %i rows and %i columns.",
-                  nrow(mat_red), ncol(mat_red)))
-  }
-  return(mat_red)
+  mat  
 }
+
