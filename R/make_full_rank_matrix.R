@@ -40,39 +40,58 @@ make_full_rank_matrix <- function(mat, verbose=FALSE){
   return(mat_mod)
 }
 
-remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
+find_empty_columns <- function(mat, tol = 1e-12, return_names=FALSE){
   empty_col <- apply(mat, MARGIN = 2, FUN = function(x) {all(abs(x) < tol)})
-  mat_red <- mat[, !empty_col]
-  if (verbose){
-    print(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
-                  sum(empty_col, na.rm = TRUE), ncol(mat_red)))
-
+  if (return_names){
+    names(which(empty_col))
+  }else{
+    empty_col
   }
-  return(mat_red)
 }
 
-merge_duplicated <- function(mat, verbose=FALSE) {
+remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
+  empty_col <- find_empty_columns(mat, tol)
+  if (sum(empty_col) > tol){
+    mat <- mat[, !empty_col, drop=FALSE]
+  }
+  if (verbose){
+    print(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
+                  sum(empty_col, na.rm = TRUE), ncol(mat)))
+
+  }
+  return(mat)
+}
+
+find_duplicated_columns <- function(mat, verbose=FALSE) {
+  stopifnot(is.matrix(mat))
+  mat_duplicated <- mat[, duplicated(mat, MARGIN = 2), drop=FALSE]
+  colnames(mat_duplicated)
+}
+
+merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
   stopifnot(is.matrix(mat))
   mat_unique <- unique(mat, MARGIN = 2)
-  mat_duplicated <- mat[, duplicated(mat, MARGIN = 2), drop=FALSE]
   colnames_unique <- colnames(mat_unique)
-  colnames_duplicated <- colnames(mat_duplicated)
-  for (c in seq_len(ncol(mat_duplicated))){
-    keep <- which(duplicated(cbind(mat_duplicated[, c], mat_unique), MARGIN = 2))-1
-    if (length(keep) > 1){
-      stop(print("More than one matching column detected. Something is wrong with this algorithm."))
+  colnames_duplicated <- find_duplicated_columns(mat)
+  if (length(colnames_duplicated) > tol){
+    for (c in seq_len(length(colnames_duplicated))){
+      keep <- which(duplicated(cbind(mat[, colnames_duplicated[c], drop=FALSE], mat_unique), MARGIN = 2))-1
+      if (length(keep) > 1){
+        stop(print("More than one matching column detected. Something is wrong with this algorithm."))
+      }
+      if (grepl("AND", colnames_unique[keep], fixed=TRUE)){
+        colnames_unique[keep] <- gsub('[()]', '', colnames_unique[keep])
+      }
+      colnames_unique[keep] <- paste0("(", colnames_unique[keep], "_AND_", colnames_duplicated[c], ")")
     }
-    if (grepl("AND", colnames_unique[keep], fixed=TRUE)){
-      colnames_unique[keep] <- gsub('[()]', '', colnames_unique[keep])
-    }
-    colnames_unique[keep] <- paste0("(", colnames_unique[keep], "_AND_", colnames_duplicated[c], ")")
+    colnames(mat_unique) <- colnames_unique
+    mat <- mat_unique
   }
-  colnames(mat_unique) <- colnames_unique
   if (verbose){
     print(sprintf("%i duplicated columns were detected. After merging duplicated columns the matrix contains %i columns.",
-                  length(colnames_duplicated), ncol(mat_unique)))
+                  length(colnames_duplicated), ncol(mat)))
   }
-  return(mat_unique)
+  return(mat)
 }
 
 collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){

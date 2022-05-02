@@ -83,7 +83,7 @@ There are already a few other packages out there that offer functions to detect 
 
 **`caret::findLinearCombos()`**: https://rdrr.io/cran/caret/man/findLinearCombos.html
 
-This function is used by `fullRankMatrix` as it identifies which columns are linearly dependent and suggests which columns to remove.
+This function identifies which columns are linearly dependent and suggests which columns to remove.
 ```{r}
 caret::findLinearCombos(mat)
 ```

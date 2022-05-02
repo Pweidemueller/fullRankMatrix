@@ -62,24 +62,24 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -1.632e+00  1.632e+00  2.102e+00 -2.102e+00 -4.448e-01  4.448e-01 -8.882e-16 
+#> -2.458e+00  2.458e+00 -7.298e-01  7.298e-01 -1.851e+00  1.851e+00  4.441e-16 
 #>          8          9         10 
-#>  1.014e+00 -1.935e+00  9.215e-01 
+#> -1.882e+00  4.121e-01  1.470e+00 
 #> 
 #> Coefficients: (1 not defined because of singularities)
 #>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry   9.1171     1.4207   6.417  0.00136 **
-#> matapple        5.8240     1.4207   4.099  0.00936 **
-#> matpear         1.6589     2.7204   0.610  0.56864   
-#> matspring       2.7263     2.0092   1.357  0.23285   
+#> matstrawberry    8.021      1.608   4.986  0.00415 **
+#> matapple         5.131      1.608   3.190  0.02427 * 
+#> matpear          4.819      3.080   1.565  0.17841   
+#> matspring        1.972      2.275   0.867  0.42555   
 #> matsummer           NA         NA      NA       NA   
-#> matfall        -0.8377     2.4607  -0.340  0.74738   
+#> matfall         -2.002      2.786  -0.719  0.50454   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.009 on 5 degrees of freedom
-#> Multiple R-squared:  0.9641, Adjusted R-squared:  0.9281 
-#> F-statistic: 26.83 on 5 and 5 DF,  p-value: 0.001279
+#> Residual standard error: 2.275 on 5 degrees of freedom
+#> Multiple R-squared:  0.9413, Adjusted R-squared:  0.8825 
+#> F-statistic: 16.03 on 5 and 5 DF,  p-value: 0.004259
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
@@ -136,29 +136,29 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -1.632e+00  1.632e+00  2.102e+00 -2.102e+00 -4.448e-01  4.448e-01  8.882e-16 
+#> -2.458e+00  2.458e+00 -7.298e-01  7.298e-01 -1.851e+00  1.851e+00  8.882e-16 
 #>          8          9         10 
-#>  1.014e+00 -1.935e+00  9.215e-01 
+#> -1.882e+00  4.121e-01  1.470e+00 
 #> 
 #> Coefficients:
 #>                                            Estimate Std. Error t value Pr(>|t|)
-#> mat_frpear                                   1.6589     2.7204   0.610  0.56864
-#> mat_frspring                                 2.7263     2.0092   1.357  0.23285
-#> mat_frfall                                  -0.8377     2.4607  -0.340  0.74738
-#> mat_frSPACE(strawberry,apple,summer)_AXIS1 -18.2342     2.8414  -6.417  0.00136
-#> mat_frSPACE(strawberry,apple,summer)_AXIS2 -10.0875     2.4607  -4.099  0.00936
+#> mat_frpear                                    4.819      3.080   1.565  0.17841
+#> mat_frspring                                  1.972      2.275   0.867  0.42555
+#> mat_frfall                                   -2.002      2.786  -0.719  0.50454
+#> mat_frSPACE(strawberry,apple,summer)_AXIS1  -16.041      3.217  -4.986  0.00415
+#> mat_frSPACE(strawberry,apple,summer)_AXIS2   -8.887      2.786  -3.190  0.02427
 #>                                              
 #> mat_frpear                                   
 #> mat_frspring                                 
 #> mat_frfall                                   
 #> mat_frSPACE(strawberry,apple,summer)_AXIS1 **
-#> mat_frSPACE(strawberry,apple,summer)_AXIS2 **
+#> mat_frSPACE(strawberry,apple,summer)_AXIS2 * 
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.009 on 5 degrees of freedom
-#> Multiple R-squared:  0.9641, Adjusted R-squared:  0.9281 
-#> F-statistic: 26.83 on 5 and 5 DF,  p-value: 0.001279
+#> Residual standard error: 2.275 on 5 degrees of freedom
+#> Multiple R-squared:  0.9413, Adjusted R-squared:  0.8825 
+#> F-statistic: 16.03 on 5 and 5 DF,  p-value: 0.004259
 ```
 
 You can see that there are no more undefined columns, since the column
@@ -180,8 +180,8 @@ detect linear dependent columns. Here are the ones we are aware of:
 **`caret::findLinearCombos()`**:
 <https://rdrr.io/cran/caret/man/findLinearCombos.html>
 
-This function is used by `fullRankMatrix` as it identifies which columns
-are linearly dependent and suggests which columns to remove.
+This function identifies which columns are linearly dependent and
+suggests which columns to remove.
 
 ``` r
 caret::findLinearCombos(mat)
@@ -248,28 +248,28 @@ plm::detect.lindep(mat_test)
 
 ``` r
 make_full_rank_matrix(mat_test)
-#>       SPACE((c1_AND_c4),c6,c7)_AXIS1
-#>  [1,]                      0.0000000
-#>  [2,]                     -0.4472136
-#>  [3,]                      0.0000000
-#>  [4,]                     -0.4472136
-#>  [5,]                     -0.4472136
-#>  [6,]                      0.0000000
-#>  [7,]                      0.0000000
-#>  [8,]                     -0.4472136
-#>  [9,]                     -0.4472136
-#> [10,]                      0.0000000
-#>       SPACE(SPACE(c2,c5)_AXIS1,SPACE((c1_AND_c4),c6,c7)_AXIS2)_AXIS1
-#>  [1,]                                                     -0.4472136
-#>  [2,]                                                      0.0000000
-#>  [3,]                                                     -0.4472136
-#>  [4,]                                                      0.0000000
-#>  [5,]                                                      0.0000000
-#>  [6,]                                                     -0.4472136
-#>  [7,]                                                     -0.4472136
-#>  [8,]                                                      0.0000000
-#>  [9,]                                                      0.0000000
-#> [10,]                                                     -0.4472136
+#>       (c1_AND_c4) SPACE(c6,c7,SPACE(c2,c5)_AXIS1)_AXIS1
+#>  [1,]           1                            -0.3333333
+#>  [2,]           1                            -0.3333333
+#>  [3,]           0                            -0.3333333
+#>  [4,]           0                            -0.3333333
+#>  [5,]           0                            -0.3333333
+#>  [6,]           0                             0.0000000
+#>  [7,]           0                            -0.3333333
+#>  [8,]           0                            -0.3333333
+#>  [9,]           1                            -0.3333333
+#> [10,]           1                            -0.3333333
+#>       SPACE(c6,c7,SPACE(c2,c5)_AXIS1)_AXIS2
+#>  [1,]                            -0.3094922
+#>  [2,]                            -0.3094922
+#>  [3,]                             0.2475938
+#>  [4,]                             0.2475938
+#>  [5,]                             0.2475938
+#>  [6,]                             0.5570860
+#>  [7,]                             0.2475938
+#>  [8,]                             0.2475938
+#>  [9,]                            -0.3094922
+#> [10,]                            -0.3094922
 ```
 
 **`Smisc::findDepMat()`**:
