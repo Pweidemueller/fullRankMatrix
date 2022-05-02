@@ -17,7 +17,7 @@
 #'   find_linear_dependent_columns(mat)  # returns list(c(1,3,4))
 #'   
 #' @export
-find_linear_dependent_columns <- function(mat, tol = 1e-6){
+find_linear_dependent_columns <- function(mat, tol = 1e-12){
   stopifnot(is.matrix(mat))
   stopifnot(is.numeric(tol), length(tol) == 1)
   qr_mat <- qr(mat)  
