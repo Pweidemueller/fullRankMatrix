@@ -80,3 +80,25 @@ test_that("find_lindependent_coef() errors if input is not of type matrix", {
   mat <- data.frame(c1, c2, c3, c4)
   expect_error(find_lindependent_coef(mat))
 })
+
+
+test_that("collapse_linearly_dependent_columns works", {
+  
+  mat <- matrix(rnorm(n = 10 * 4), nrow = 10, ncol = 4, dimnames = list(character(0L), paste0("col_", 1:4)))
+  mat <- cbind(mat, comb_12 = mat[,1] + 2 * mat[,2], col_6 = rnorm(10))  
+  red_mat <- collapse_linearly_dependent_columns(mat)
+  expect_equal(ncol(red_mat), 5)
+  expect_equal(qr(red_mat)$rank, 5)
+  expect_equal(colnames(red_mat), c("col_3", "col_4", "col_6", "SPACE(col_1,col_2,comb_12)_AXIS1", "SPACE(col_1,col_2,comb_12)_AXIS2"))
+
+  mat <- cbind(mat, comb_34 = 0.3 * mat[,3] + 0.4 * mat[,4], col_8 = rnorm(10))  
+  red_mat <- collapse_linearly_dependent_columns(mat)
+  expect_equal(ncol(red_mat), 6)
+  expect_equal(qr(red_mat)$rank, 6)
+  expect_equal(colnames(red_mat), c("col_6", "col_8", "SPACE(col_1,col_2,comb_12)_AXIS1", "SPACE(col_1,col_2,comb_12)_AXIS2", "SPACE(col_3,col_4,comb_34)_AXIS1", "SPACE(col_3,col_4,comb_34)_AXIS2"))
+  
+  mat <- cbind(mat, comb_14 = 2 * mat[,1] + 4 * mat[,4])  
+  red_mat <- collapse_linearly_dependent_columns(mat)
+  expect_equal(ncol(red_mat), 6)
+  expect_equal(qr(red_mat)$rank, 6)
+})
