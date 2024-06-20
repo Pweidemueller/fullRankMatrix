@@ -2,14 +2,20 @@ Package: fullRankMatrix
 Title: Produce a Full Rank Matrix
 Version: 0.0.0.9000
 Authors@R: 
-    person("Paula", "Weidemueller", , "p.weidemueller@posteo.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3867-3131"))
+    c(
+    person("Paula", "Weidemueller", , "p.weidemueller@posteo.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3867-3131")),
+    person("Constantin", "Ahlmann-Eltze", , "abc@gmail.com", role = c("aut"))
+    )
 Description: This package will help users to create a full rank matrix out of their model matrix.
     It discovers linear dependent columns and then renames and removes columns to make the matrix full rank.
 License: GPL (>= 3)
 Encoding: UTF-8
+Depends: 
+    R (>= 4.4.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -4,17 +4,20 @@
 \alias{make_full_rank_matrix}
 \title{Create a full rank matrix}
 \usage{
-make_full_rank_matrix(mat, verbose = FALSE)
+make_full_rank_matrix(mat, verbose = FALSE, save_space_cols = TRUE)
 }
 \arguments{
 \item{mat}{A matrix.}
 
 \item{verbose}{Print how column numbers change with each operation.}
+
+\item{save_space_cols}{For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder \code{SPACES} within which the files will be saved:\verb{SPACE_<i>.txt}}
 }
 \value{
 A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 \itemize{
 \item \code{(c1_AND_c2)} If multiple columns are exactly identical, only a single instance is retained.
+\item \verb{SPACE_<i>_AXIS<j>} If columns were linearly dependent, a linearly independent space was created that contains these columns
 Its column name lists the names of the columns that were collapsed into one.
 }
 }
