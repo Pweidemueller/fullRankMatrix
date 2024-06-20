@@ -4,7 +4,7 @@
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
-#' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`
+#' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`. Default is FALSE.
 #'
 #' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 #'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
@@ -24,7 +24,7 @@
 #' make_full_rank_matrix(mat)
 #' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
 
-make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=TRUE){
+make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
   validate_column_names(colnames(mat))
   if (verbose){
     print(sprintf("The original matrix contains %i rows and %i columns. The matrix has rank %i.",
@@ -96,12 +96,14 @@ merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
   return(mat)
 }
 
-collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE, save_space_cols=TRUE){
+collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE, save_space_cols = FALSE){
   stopifnot(is.matrix(mat))
   validate_column_names(colnames(mat))
 
-  if (!dir.exists("SPACES")) {
-    dir.create("SPACES")
+  if (save_space_cols==TRUE) {
+    if (!dir.exists("SPACES")) {
+      dir.create("SPACES")
+    }
   }
 
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)

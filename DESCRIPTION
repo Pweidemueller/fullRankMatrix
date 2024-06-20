@@ -4,11 +4,11 @@ Version: 0.0.0.9000
 Authors@R: 
     c(
     person("Paula", "Weidemueller", , "p.weidemueller@posteo.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3867-3131")),
-    person("Constantin", "Ahlmann-Eltze", , "abc@gmail.com", role = c("aut"))
+    person("Constantin", "Ahlmann-Eltze", , "artjom31415@googlemail.com", role = c("aut"))
     )
 Description: This package will help users to create a full rank matrix out of their model matrix.
     It discovers linear dependent columns and then renames and removes columns to make the matrix full rank.
-License: GPL (>= 3)
+License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: 
     R (>= 4.4.0)

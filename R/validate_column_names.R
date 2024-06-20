@@ -12,10 +12,8 @@
 #' @export
 #'
 #' @examples
-#' validate_column_names(c("name", "age", "gender")) # Returns TRUE
-#' validate_column_names(c("name", "age", "")) # Error: The empty string `""` is not a valid column name.
-#' validate_column_names(c("name", "age", NA)) # Error: None of the names must be `NA`.
-#' validate_column_names(c("name", "age", "age")) # Error: The column names must be unique.
+#' validate_column_names(c("name", "age", "gender"))
+#'
 validate_column_names <- function(names){
   if(is.null(names)){
     stop("The column names must not be `NULL`.")
