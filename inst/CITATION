@@ -1,0 +1,14 @@
+bibentry(
+  bibtype = "Manual",
+  title = "fullRankMatrix: Produce a Full Rank Matrix",
+  author = c(
+    person("Paula", "Weidemueller", role = c("aut", "cre"),
+           email = "p.weidemueller@posteo.de",
+           comment = c(ORCID = "0000-0003-3867-3131")),
+    person("Constantin", "Ahlmann-Eltze", role = c("aut"),
+           email = "abc@gmail.com")
+  ),
+  year = 2023,
+  note = "R package version 0.0.0.9000",
+  url = "https://github.com/yourusername/fullRankMatrix"
+)

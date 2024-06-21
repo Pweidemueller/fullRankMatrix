@@ -4,22 +4,28 @@
 \alias{make_full_rank_matrix}
 \title{Create a full rank matrix}
 \usage{
-make_full_rank_matrix(mat, verbose = FALSE)
+make_full_rank_matrix(mat, verbose = FALSE, save_space_cols = FALSE)
 }
 \arguments{
 \item{mat}{A matrix.}
 
 \item{verbose}{Print how column numbers change with each operation.}
+
+\item{save_space_cols}{For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder \code{SPACES} within which the files will be saved:\verb{SPACE_<i>.txt}. Default is FALSE.}
 }
 \value{
-A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
+a list containing:
+\itemize{
+\item \code{matrix}: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 \itemize{
 \item \code{(c1_AND_c2)} If multiple columns are exactly identical, only a single instance is retained.
-Its column name lists the names of the columns that were collapsed into one.
+\item \verb{SPACE_<i>_AXIS<j>} If columns were linearly dependent, a linearly independent space was created that contains these columns.
+}
+\item \code{space_list}: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
 }
 }
 \description{
-This function first removes empty columns. Then it discovers linear dependent columns, then removes and renames columns to make the matrix full rank.
+This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
 }
 \examples{
 c1 <- rbinom(10, 1, .4)
@@ -31,5 +37,6 @@ c6 <- rbinom(10, 1, .8)
 c7 <- c5+c6
 mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
 make_full_rank_matrix(mat)
-mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
+result <- make_full_rank_matrix(mat, verbose=TRUE)
+mat_full <- result$matrix
 }

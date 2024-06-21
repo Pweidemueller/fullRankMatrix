@@ -1,5 +1,19 @@
-
-
+#' Validate Column Names
+#'
+#' This function checks a vector of column names to ensure they are valid. It performs the following checks:
+#' - The column names must not be `NULL`.
+#' - The column names must not contain empty strings.
+#' - The column names must not contain `NA` values.
+#' - The column names must be unique.
+#'
+#' @param names A character vector of column names to validate.
+#'
+#' @return Returns `TRUE` if all checks pass. If any check fails, the function stops and returns an error message.
+#' @export
+#'
+#' @examples
+#' validate_column_names(c("name", "age", "gender"))
+#'
 validate_column_names <- function(names){
   if(is.null(names)){
     stop("The column names must not be `NULL`.")

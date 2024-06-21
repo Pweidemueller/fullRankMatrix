@@ -1,13 +1,17 @@
 #' Create a full rank matrix
 #'
-#' This function first removes empty columns. Then it discovers linear dependent columns, then removes and renames columns to make the matrix full rank.
+#' This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
+#' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`. Default is FALSE.
 #'
-#' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
-#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
-#'   Its column name lists the names of the columns that were collapsed into one.
+#' @return a list containing:
+#'    * `matrix`: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
+#'        * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
+#'        * `SPACE_<i>_AXIS<j>` If columns were linearly dependent, a linearly independent space was created that contains these columns.
+#'    * `space_list`: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
+#'
 #' @export
 #'
 #' @examples
@@ -20,24 +24,35 @@
 #' c7 <- c5+c6
 #' mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
 #' make_full_rank_matrix(mat)
-#' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
+#' result <- make_full_rank_matrix(mat, verbose=TRUE)
+#' mat_full <- result$matrix
 
-make_full_rank_matrix <- function(mat, verbose=FALSE){
+make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
+
+  if (!is.matrix(mat)) {
+    stop("The input is not a matrix.")
+  }
+  if (any(is.na(mat))) {
+    stop("Error: The matrix contains NA values.")
+  }
+
   validate_column_names(colnames(mat))
   if (verbose){
-    print(sprintf("The original matrix contains %i rows and %i columns. The matrix has rank %i.",
+    message(sprintf("The original matrix contains %i rows and %i columns. The matrix has rank %i.",
                   dim(mat)[1], dim(mat)[2], qr(mat)$rank))
   }
   mat_mod <- remove_empty_columns(mat, verbose=verbose)
   mat_mod <- merge_duplicated(mat_mod, verbose=verbose)
-  mat_mod <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose)
+  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose, save_space_cols=save_space_cols)
+  mat_mod <- result$matrix
+
   if (ncol(mat_mod) > qr(mat)$rank){
-    stop(print("The modified matrix still has more columns than implied by rank. Check manually why modified matrix is not full rank after applying make_full_rank_matrix()."))
+    stop(message("The modified matrix still has more columns than implied by rank. Check manually why modified matrix is not full rank after applying make_full_rank_matrix()."))
   }
   if (verbose){
-    print("The matrix is now full rank.")
+    message("The matrix is now full rank.")
   }
-  return(mat_mod)
+  return(result)
 }
 
 find_empty_columns <- function(mat, tol = 1e-12, return_names=FALSE){
@@ -55,7 +70,7 @@ remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
     mat <- mat[, !empty_col, drop=FALSE]
   }
   if (verbose){
-    print(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
+    message(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
                   sum(empty_col, na.rm = TRUE), ncol(mat)))
 
   }
@@ -70,6 +85,10 @@ find_duplicated_columns <- function(mat, verbose=FALSE) {
 
 merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
   stopifnot(is.matrix(mat))
+  if (any(is.na(mat))) {
+    stop("Error: The matrix contains NA values.")
+  }
+
   mat_unique <- unique(mat, MARGIN = 2)
   colnames_unique <- colnames(mat_unique)
   colnames_duplicated <- find_duplicated_columns(mat)
@@ -77,9 +96,9 @@ merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
     for (c in seq_len(length(colnames_duplicated))){
       keep <- which(duplicated(cbind(mat[, colnames_duplicated[c], drop=FALSE], mat_unique), MARGIN = 2))-1
       if (length(keep) > 1){
-        stop(print("More than one matching column detected. Something is wrong with this algorithm."))
+        stop(message("More than one matching column detected. Something is wrong with this algorithm."))
       }
-      if (grepl("AND", colnames_unique[keep], fixed=TRUE)){
+      if (grepl("_AND_", colnames_unique[keep], fixed=TRUE)){
         colnames_unique[keep] <- gsub('[()]', '', colnames_unique[keep])
       }
       colnames_unique[keep] <- paste0("(", colnames_unique[keep], "_AND_", colnames_duplicated[c], ")")
@@ -88,18 +107,31 @@ merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
     mat <- mat_unique
   }
   if (verbose){
-    print(sprintf("%i duplicated columns were detected. After merging duplicated columns the matrix contains %i columns.",
+    message(sprintf("%i duplicated columns were detected. After merging duplicated columns the matrix contains %i columns.",
                   length(colnames_duplicated), ncol(mat)))
   }
   return(mat)
 }
 
-collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
+collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE, save_space_cols = FALSE){
   stopifnot(is.matrix(mat))
+  if (any(is.na(mat))) {
+    stop("Error: The matrix contains NA values.")
+  }
   validate_column_names(colnames(mat))
 
+  if (save_space_cols==TRUE) {
+    if (!dir.exists("SPACES")) {
+      dir.create("SPACES")
+    }
+  }
+
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
-  while(length(linear_dependencies) != 0){
+
+  space_counter <- 1
+  space_list <- list()
+
+  while(length(linear_dependencies) > 0){
     dependent_set <- linear_dependencies[[1]]
     dependent_columns <- mat[,dependent_set,drop=FALSE]
     mat <- mat[,-dependent_set,drop=FALSE]
@@ -108,17 +140,29 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
     new_space <- qr.Q(qr_space)[,seq_len(rank_of_set),drop=FALSE]
 
     # Handle names
-    new_names <- paste0("SPACE(", paste0(colnames(dependent_columns), collapse = ",") ,")_AXIS", seq_len(rank_of_set))
+    # if a lot of linearly dependencies exist, adding the original column names to the new column names might get prohibitively large
+    # instead label each new space by a number and save which original columns it was composed of in a corresponding file
+    if (save_space_cols==TRUE) {
+      space_file <- paste0("SPACES/SPACE_", space_counter, ".txt")
+      writeLines(colnames(dependent_columns), con = space_file)
+    }
+
+    space_name <- paste0("SPACE_", space_counter)
+    space_list[[space_name]] <- colnames(dependent_columns)
+
+    new_names <- paste0("SPACE_", space_counter, "_AXIS", seq_len(rank_of_set))
+
     colnames(new_space) <- new_names
     mat <- cbind(mat, new_space)
 
     # Changing the matrix could introduce new dependencies
     linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
+    space_counter <- space_counter + 1
   }
   if (verbose){
-        print(sprintf("The matrix after collapsing linearly dependent columns contains %i rows and %i columns.",
+        message(sprintf("The matrix after collapsing linearly dependent columns contains %i rows and %i columns.",
                       nrow(mat), ncol(mat)))
       }
-  mat
+  list(matrix = mat, space_list = space_list)
 }
 

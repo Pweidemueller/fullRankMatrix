@@ -1,5 +1,5 @@
 
-#' Find linear dependent columns in a matrix
+#' Find linear dependent columns in a design matrix
 #'
 #' @importFrom stats lm.fit
 #'
