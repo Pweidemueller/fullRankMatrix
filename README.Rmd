@@ -13,18 +13,17 @@ knitr::opts_chunk$set(
 )
 ```
 
-# fullRankMatrix
+# fullRankMatrix: no linearly dependent columns in design matrices <a href='https://github.com/Pweidemueller/fullRankMatrix'><img src='man/figures/fullRankMatrix.svg' align="right" height="209" /></a>
 
 <!-- badges: start -->
 <!-- badges: end -->
-
 We developed `fullRankMatrix` primarily for one-hot encoded design matrices used in linear models. Especially for large one-hot encoded design matrices, the chances of having linearly dependent columns is high which will hinder interpretation of association between independent and dependent variables in the linear model (see example below).
 
 The goal of `fullRankMatrix` is to remove empty columns (contain only 0's), merge duplicated columns (containing the same entries) and merge linearly dependent columns. These operations will create a matrix of full rank. The changes made to the columns are reflected in the column headers such that the columns can still be interpreted if the matrix is used in e.g. a linear model fit.
 
 ## Installation
 
-You can install the development version of `fullRankMatrix` from [GitHub](https://github.com/) with:
+You can install the development version of `fullRankMatrix` from [GitHub](https://github.com/Pweidemueller/fullRankMatrix) with:
 
 ```r
 # install.packages("devtools")
