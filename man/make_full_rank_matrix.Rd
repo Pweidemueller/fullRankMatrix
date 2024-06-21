@@ -25,7 +25,7 @@ a list containing:
 }
 }
 \description{
-This function first removes empty columns. Then it discovers linear dependent columns, then removes and renames columns to make the matrix full rank.
+This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
 }
 \examples{
 c1 <- rbinom(10, 1, .4)

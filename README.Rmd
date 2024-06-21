@@ -39,7 +39,7 @@ When using linear models you should check if any of the columns in your model ma
 # in addition we classify them by the season they were harvested in
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
 apple <- c(0,0,0,0,1,1,1,0,0,0)
-pear <- c(0,0,0,0,0,0,0,1,1,1)
+pear <- c(0,0,0,1,0,0,0,1,1,1)
 spring <- c(1,1,0,0,0,0,0,0,0,0)
 summer <- c(1,1,1,1,1,1,1,0,0,0)
 fall <- c(0,0,0,0,0,0,1,1,1,1)

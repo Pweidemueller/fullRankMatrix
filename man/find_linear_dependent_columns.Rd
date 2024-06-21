@@ -2,7 +2,7 @@
 % Please edit documentation in R/find_linear_dependent_columns.R
 \name{find_linear_dependent_columns}
 \alias{find_linear_dependent_columns}
-\title{Find linear dependent columns in a matrix}
+\title{Find linear dependent columns in a design matrix}
 \usage{
 find_linear_dependent_columns(mat, tol = 1e-12)
 }
@@ -15,7 +15,7 @@ find_linear_dependent_columns(mat, tol = 1e-12)
 a list with vectors containing the indices of linearly dependent columns
 }
 \description{
-Find linear dependent columns in a matrix
+Find linear dependent columns in a design matrix
 }
 \examples{
   mat <- matrix(rnorm(3 * 10), nrow = 10, ncol = 3)
