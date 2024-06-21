@@ -6,10 +6,12 @@
 #' @param verbose Print how column numbers change with each operation.
 #' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`. Default is FALSE.
 #'
-#' @return A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
-#'    * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
-#'    * `SPACE_<i>_AXIS<j>` If columns were linearly dependent, a linearly independent space was created that contains these columns
-#'   Its column name lists the names of the columns that were collapsed into one.
+#' @return a list containing:
+#'    * `matrix`: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
+#'        * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
+#'        * `SPACE_<i>_AXIS<j>` If columns were linearly dependent, a linearly independent space was created that contains these columns.
+#'    * `space_list`: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
+#'
 #' @export
 #'
 #' @examples
@@ -22,7 +24,8 @@
 #' c7 <- c5+c6
 #' mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
 #' make_full_rank_matrix(mat)
-#' mat_full <- make_full_rank_matrix(mat, verbose=TRUE)
+#' result <- make_full_rank_matrix(mat, verbose=TRUE)
+#' mat_full <- result$matrix
 
 make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
   validate_column_names(colnames(mat))
@@ -32,14 +35,16 @@ make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
   }
   mat_mod <- remove_empty_columns(mat, verbose=verbose)
   mat_mod <- merge_duplicated(mat_mod, verbose=verbose)
-  mat_mod <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose, save_space_cols=save_space_cols)
+  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose, save_space_cols=save_space_cols)
+  mat_mod <- result$matrix
+
   if (ncol(mat_mod) > qr(mat)$rank){
     stop(print("The modified matrix still has more columns than implied by rank. Check manually why modified matrix is not full rank after applying make_full_rank_matrix()."))
   }
   if (verbose){
     print("The matrix is now full rank.")
   }
-  return(mat_mod)
+  return(result)
 }
 
 find_empty_columns <- function(mat, tol = 1e-12, return_names=FALSE){
@@ -109,6 +114,7 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
 
   space_counter <- 1
+  space_list <- list()
 
   while(length(linear_dependencies) > 0){
     dependent_set <- linear_dependencies[[1]]
@@ -125,6 +131,10 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
       space_file <- paste0("SPACES/SPACE_", space_counter, ".txt")
       writeLines(colnames(dependent_columns), con = space_file)
     }
+
+    space_name <- paste0("SPACE_", space_counter)
+    space_list[[space_name]] <- colnames(dependent_columns)
+
     new_names <- paste0("SPACE_", space_counter, "_AXIS", seq_len(rank_of_set))
 
     colnames(new_space) <- new_names
@@ -138,6 +148,6 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
         print(sprintf("The matrix after collapsing linearly dependent columns contains %i rows and %i columns.",
                       nrow(mat), ncol(mat)))
       }
-  mat
+  list(matrix = mat, space_list = space_list)
 }
 

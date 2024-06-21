@@ -6,15 +6,22 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
+We developed `fullRankMatrix` primarily for one-hot encoded design
+matrices used in linear models. Especially for large one-hot encoded
+design matrices, the chances of having linearly dependent columns is
+high which will hinder interpretation of association between independent
+and dependent variables in the linear model (see example below).
+
 The goal of `fullRankMatrix` is to remove empty columns (contain only
-0’s), merge duplicated columns and merge linearly dependent columns.
-These operations will create a matrix of full rank. The changes made to
-the columns are reflected in the column headers interpretability if the
-matrix is used in e.g. a linear model fit.
+0’s), merge duplicated columns (containing the same entries) and merge
+linearly dependent columns. These operations will create a matrix of
+full rank. The changes made to the columns are reflected in the column
+headers such that the columns can still be interpreted if the matrix is
+used in e.g. a linear model fit.
 
 ## Installation
 
-You can install the development version of fullRankMatrix from
+You can install the development version of `fullRankMatrix` from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -25,15 +32,15 @@ devtools::install_github("Pweidemueller/fullRankMatrix")
 ## Example
 
 When using linear models you should check if any of the columns in your
-model matrix are linearly dependent. If they are this will alter the
+model matrix are linearly dependent. If there are, this will alter the
 interpretation of the model fit. Here is a rather constructed example
 where we are interested in identifying the factors that make fruit
-sweet. We can classify fruit into what fruit they are and also at what
-season they are harvested.
+sweet. We can classify fruit into what fruit type they are and also at
+what season they were harvested in.
 
 ``` r
 # let's say we have 10 fruits and can classify them into strawberries, apples or pears
-# in addition we classify them by the season they are harvested in
+# in addition we classify them by the season they were harvested in
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
 apple <- c(0,0,0,0,1,1,1,0,0,0)
 pear <- c(0,0,0,0,0,0,0,1,1,1)
@@ -42,6 +49,7 @@ summer <- c(1,1,1,1,1,1,1,0,0,0)
 fall <- c(0,0,0,0,0,0,1,1,1,1)
 
 # let's pretend we know how each factor influences the sweetness of a fruit
+# in this case we say that strawberry and summer have the biggest influence on sweetness
 strawberry_sweet <- strawberry * rnorm(10, 4)
 apple_sweet <- apple * rnorm(10, 1)
 pear_sweet <- pear * rnorm(10, 0.5)
@@ -62,24 +70,24 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -2.458e+00  2.458e+00 -7.298e-01  7.298e-01 -1.851e+00  1.851e+00  4.441e-16 
+#> -7.764e-01  7.764e-01  5.993e-01 -5.993e-01  6.734e-01 -6.734e-01 -3.331e-16 
 #>          8          9         10 
-#> -1.882e+00  4.121e-01  1.470e+00 
+#>  1.050e+00 -5.556e-01 -4.943e-01 
 #> 
 #> Coefficients: (1 not defined because of singularities)
-#>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry    8.021      1.608   4.986  0.00415 **
-#> matapple         5.131      1.608   3.190  0.02427 * 
-#> matpear          4.819      3.080   1.565  0.17841   
-#> matspring        1.972      2.275   0.867  0.42555   
-#> matsummer           NA         NA      NA       NA   
-#> matfall         -2.002      2.786  -0.719  0.50454   
+#>               Estimate Std. Error t value Pr(>|t|)    
+#> matstrawberry   9.7569     0.6698  14.567 2.75e-05 ***
+#> matapple        5.0020     0.6698   7.468  0.00068 ***
+#> matpear        -0.6128     1.2826  -0.478  0.65295    
+#> matspring      -1.3990     0.9472  -1.477  0.19972    
+#> matsummer           NA         NA      NA       NA    
+#> matfall         2.4783     1.1601   2.136  0.08572 .  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.275 on 5 degrees of freedom
-#> Multiple R-squared:  0.9413, Adjusted R-squared:  0.8825 
-#> F-statistic: 16.03 on 5 and 5 DF,  p-value: 0.004259
+#> Residual standard error: 0.9472 on 5 degrees of freedom
+#> Multiple R-squared:  0.9901, Adjusted R-squared:  0.9801 
+#> F-statistic: 99.53 on 5 and 5 DF,  p-value: 5.304e-05
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
@@ -87,44 +95,52 @@ As you can see `lm` realizes that there are linearly dependent columns
 linearly dependent with.
 
 So if you would just look at the columns and not consider the `NA`
-further, you would interpret that `strawberry`, `apple` and `spring`
-make fruit sweet.
+further, you would interpret that `strawberry` and `apple` make fruit
+sweet.
 
-However, when you look at the model matrix you can see that `summer` is
-a linear combination of `strawberry` and `apple`. So truly any of the
-three factors could contribute to the sweetness of a fruit, the linear
-model has no way of recovering which one given these 10 examples.
+However, when you look at the model matrix you can see that the `summer`
+column is a linear combination of the `strawberry` and `apple` columns
+(or vice versa). So truly any of the three factors could contribute to
+the sweetness of a fruit, the linear model has no way of recovering
+which one given these 10 examples.
 
-To make such cases more obvious we wrote `fullRankMatrix`, it removes
-linearly dependent columns and renames the remaining columns to make the
+``` r
+mat
+#>       strawberry apple pear spring summer fall
+#>  [1,]          1     0    0      1      1    0
+#>  [2,]          1     0    0      1      1    0
+#>  [3,]          1     0    0      0      1    0
+#>  [4,]          1     0    0      0      1    0
+#>  [5,]          0     1    0      0      1    0
+#>  [6,]          0     1    0      0      1    0
+#>  [7,]          0     1    0      0      1    1
+#>  [8,]          0     0    1      0      0    1
+#>  [9,]          0     0    1      0      0    1
+#> [10,]          0     0    1      0      0    1
+```
+
+To make such cases more obvious and retain interpretability of the
+linear model fit we wrote `fullRankMatrix`, it removes linearly
+dependent columns and renames the remaining columns to make the
 dependencies clear using the `make_full_rank_matrix()` function.
 
 ``` r
 library(fullRankMatrix)
-mat_fr <- make_full_rank_matrix(mat)
+result <- make_full_rank_matrix(mat)
+mat_fr <- result$matrix
+space_list <- result$space_list
 mat_fr
-#>       pear spring fall SPACE(strawberry,apple,summer)_AXIS1
-#>  [1,]    0      1    0                                 -0.5
-#>  [2,]    0      1    0                                 -0.5
-#>  [3,]    0      0    0                                 -0.5
-#>  [4,]    0      0    0                                 -0.5
-#>  [5,]    0      0    0                                  0.0
-#>  [6,]    0      0    0                                  0.0
-#>  [7,]    0      0    1                                  0.0
-#>  [8,]    1      0    1                                  0.0
-#>  [9,]    1      0    1                                  0.0
-#> [10,]    1      0    1                                  0.0
-#>       SPACE(strawberry,apple,summer)_AXIS2
-#>  [1,]                            0.0000000
-#>  [2,]                            0.0000000
-#>  [3,]                            0.0000000
-#>  [4,]                            0.0000000
-#>  [5,]                           -0.5773503
-#>  [6,]                           -0.5773503
-#>  [7,]                           -0.5773503
-#>  [8,]                            0.0000000
-#>  [9,]                            0.0000000
-#> [10,]                            0.0000000
+#>       pear spring fall SPACE_1_AXIS1 SPACE_1_AXIS2
+#>  [1,]    0      1    0          -0.5     0.0000000
+#>  [2,]    0      1    0          -0.5     0.0000000
+#>  [3,]    0      0    0          -0.5     0.0000000
+#>  [4,]    0      0    0          -0.5     0.0000000
+#>  [5,]    0      0    0           0.0    -0.5773503
+#>  [6,]    0      0    0           0.0    -0.5773503
+#>  [7,]    0      0    1           0.0    -0.5773503
+#>  [8,]    1      0    1           0.0     0.0000000
+#>  [9,]    1      0    1           0.0     0.0000000
+#> [10,]    1      0    1           0.0     0.0000000
 ```
 
 ``` r
@@ -136,41 +152,46 @@ print(summary(fit))
 #> 
 #> Residuals:
 #>          1          2          3          4          5          6          7 
-#> -2.458e+00  2.458e+00 -7.298e-01  7.298e-01 -1.851e+00  1.851e+00  8.882e-16 
+#> -7.764e-01  7.764e-01  5.993e-01 -5.993e-01  6.734e-01 -6.734e-01  2.220e-16 
 #>          8          9         10 
-#> -1.882e+00  4.121e-01  1.470e+00 
+#>  1.050e+00 -5.556e-01 -4.943e-01 
 #> 
 #> Coefficients:
-#>                                            Estimate Std. Error t value Pr(>|t|)
-#> mat_frpear                                    4.819      3.080   1.565  0.17841
-#> mat_frspring                                  1.972      2.275   0.867  0.42555
-#> mat_frfall                                   -2.002      2.786  -0.719  0.50454
-#> mat_frSPACE(strawberry,apple,summer)_AXIS1  -16.041      3.217  -4.986  0.00415
-#> mat_frSPACE(strawberry,apple,summer)_AXIS2   -8.887      2.786  -3.190  0.02427
-#>                                              
-#> mat_frpear                                   
-#> mat_frspring                                 
-#> mat_frfall                                   
-#> mat_frSPACE(strawberry,apple,summer)_AXIS1 **
-#> mat_frSPACE(strawberry,apple,summer)_AXIS2 * 
+#>                     Estimate Std. Error t value Pr(>|t|)    
+#> mat_frpear           -0.6128     1.2826  -0.478  0.65295    
+#> mat_frspring         -1.3990     0.9472  -1.477  0.19972    
+#> mat_frfall            2.4783     1.1601   2.136  0.08572 .  
+#> mat_frSPACE_1_AXIS1 -19.5137     1.3396 -14.567 2.75e-05 ***
+#> mat_frSPACE_1_AXIS2  -8.6637     1.1601  -7.468  0.00068 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 2.275 on 5 degrees of freedom
-#> Multiple R-squared:  0.9413, Adjusted R-squared:  0.8825 
-#> F-statistic: 16.03 on 5 and 5 DF,  p-value: 0.004259
+#> Residual standard error: 0.9472 on 5 degrees of freedom
+#> Multiple R-squared:  0.9901, Adjusted R-squared:  0.9801 
+#> F-statistic: 99.53 on 5 and 5 DF,  p-value: 5.304e-05
 ```
 
-You can see that there are no more undefined columns, since the column
-`summer` was removed. The three columns `strawberry`, `apple` and
-`summer` have now been replaced with two orthogonal (linearly
-independent) columns called `SPACE(strawberry,apple,summer)_AXIS1` and
-`SPACE(strawberry,apple,summer)_AXIS2` to indicate that a combination of
-all three variables (`strawberry`, `apple`, `summer`) could make the
-fruit sweet. A further resolution which of the three variables is most
-strongly associated with `sweetness` is not possible with the given
-number of observations, but there is definitely an association of
-`sweetness` with the space spanned by the three variables.
+You can see that there are no more undefined columns. The columns
+`strawberry`, `apple` and `summer` were removed and replaced with two
+columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent
+(orthogonal) vectors that span the space previously spanned by the
+linearly dependent columns `strawberry`, `apple` and `summer`. The
+original columns that are contained with a space can be viewed in the
+returned `space_list`:
+
+``` r
+space_list
+#> $SPACE_1
+#> [1] "strawberry" "apple"      "summer"
+```
+
+In terms of interpretation the individual axes of the space have no
+meaning, but seeing that the space of `strawberry`, `apple` and `summer`
+show a significant association with the sweetness of fruit. A further
+resolution which of the three variables is most strongly associated with
+`sweetness` is not possible with the given number of observations, but
+there is definitely an association of `sweetness` with the space spanned
+by the three variables.
 
 ### Other available packages that detect linear dependent columns
 
@@ -181,27 +202,61 @@ detect linear dependent columns. Here are the ones we are aware of:
 <https://rdrr.io/cran/caret/man/findLinearCombos.html>
 
 This function identifies which columns are linearly dependent and
-suggests which columns to remove.
+suggests which columns to remove. But it doesn’t provide appropriate
+naming for the remaining columns to indicate that any significant
+associations with the remaining columns is actually an association with
+the space spanned by the originally linearly dependent columns. Just
+removing the 5th column (`summer`) and then fitting the linear model
+would lead to erroneous interpretation.
 
 ``` r
-caret::findLinearCombos(mat)
-#> $linearCombos
-#> $linearCombos[[1]]
-#> [1] 5 1 2
+caret_result <- caret::findLinearCombos(mat)
+```
+
+Fitting a linear model with the 5th column (`summer`) removed would lead
+to erroneous interpretation that `strawberry` and `apple` influence the
+`sweetness`, but we know it is actually `strawberry` and `summer`.
+
+``` r
+mat_caret <- mat[, -caret_result$remove]
+fit <- lm(sweetness ~ mat_caret + 0)
+print(summary(fit))
 #> 
+#> Call:
+#> lm(formula = sweetness ~ mat_caret + 0)
 #> 
-#> $remove
-#> [1] 5
+#> Residuals:
+#>          1          2          3          4          5          6          7 
+#> -7.764e-01  7.764e-01  5.993e-01 -5.993e-01  6.734e-01 -6.734e-01 -3.331e-16 
+#>          8          9         10 
+#>  1.050e+00 -5.556e-01 -4.943e-01 
+#> 
+#> Coefficients:
+#>                     Estimate Std. Error t value Pr(>|t|)    
+#> mat_caretstrawberry   9.7569     0.6698  14.567 2.75e-05 ***
+#> mat_caretapple        5.0020     0.6698   7.468  0.00068 ***
+#> mat_caretpear        -0.6128     1.2826  -0.478  0.65295    
+#> mat_caretspring      -1.3990     0.9472  -1.477  0.19972    
+#> mat_caretfall         2.4783     1.1601   2.136  0.08572 .  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 0.9472 on 5 degrees of freedom
+#> Multiple R-squared:  0.9901, Adjusted R-squared:  0.9801 
+#> F-statistic: 99.53 on 5 and 5 DF,  p-value: 5.304e-05
 ```
 
 **`WeightIt::make_full_rank()`**:
 <https://rdrr.io/cran/WeightIt/man/make_full_rank.html>
 
-This function removes linearly dependent columns, but doesn’t rename the
-remaining columns accordingly.
+This function removes some of the linearly dependent columns to create a
+full rank matrix, but doesn’t rename the remaining columns accordingly.
+For the user it isn’t clear which columns were linearly dependent and
+they can’t choose which column will be removed.
 
 ``` r
-WeightIt::make_full_rank(mat, with.intercept = FALSE)
+mat_weightit <- WeightIt::make_full_rank(mat, with.intercept = FALSE)
+mat_weightit
 #>       strawberry apple pear spring fall
 #>  [1,]          1     0    0      1    0
 #>  [2,]          1     0    0      1    0
@@ -213,6 +268,38 @@ WeightIt::make_full_rank(mat, with.intercept = FALSE)
 #>  [8,]          0     0    1      0    1
 #>  [9,]          0     0    1      0    1
 #> [10,]          0     0    1      0    1
+```
+
+As above fitting a linear model with this full rank matrix would lead to
+erroneous interpretation that `strawberry` and `apple` influence the
+`sweetness`, but we know it is actually `strawberry` and `summer`.
+
+``` r
+fit <- lm(sweetness ~ mat_weightit + 0)
+print(summary(fit))
+#> 
+#> Call:
+#> lm(formula = sweetness ~ mat_weightit + 0)
+#> 
+#> Residuals:
+#>          1          2          3          4          5          6          7 
+#> -7.764e-01  7.764e-01  5.993e-01 -5.993e-01  6.734e-01 -6.734e-01 -3.331e-16 
+#>          8          9         10 
+#>  1.050e+00 -5.556e-01 -4.943e-01 
+#> 
+#> Coefficients:
+#>                        Estimate Std. Error t value Pr(>|t|)    
+#> mat_weightitstrawberry   9.7569     0.6698  14.567 2.75e-05 ***
+#> mat_weightitapple        5.0020     0.6698   7.468  0.00068 ***
+#> mat_weightitpear        -0.6128     1.2826  -0.478  0.65295    
+#> mat_weightitspring      -1.3990     0.9472  -1.477  0.19972    
+#> mat_weightitfall         2.4783     1.1601   2.136  0.08572 .  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 0.9472 on 5 degrees of freedom
+#> Multiple R-squared:  0.9901, Adjusted R-squared:  0.9801 
+#> F-statistic: 99.53 on 5 and 5 DF,  p-value: 5.304e-05
 ```
 
 **`plm::detect.lindep()`:**
@@ -247,55 +334,44 @@ plm::detect.lindep(mat_test)
 `fullRankMatrix` captures these cases:
 
 ``` r
-make_full_rank_matrix(mat_test)
-#>       (c1_AND_c4) SPACE(c6,c7,SPACE(c2,c5)_AXIS1)_AXIS1
-#>  [1,]           1                            -0.3333333
-#>  [2,]           1                            -0.3333333
-#>  [3,]           0                            -0.3333333
-#>  [4,]           0                            -0.3333333
-#>  [5,]           0                            -0.3333333
-#>  [6,]           0                             0.0000000
-#>  [7,]           0                            -0.3333333
-#>  [8,]           0                            -0.3333333
-#>  [9,]           1                            -0.3333333
-#> [10,]           1                            -0.3333333
-#>       SPACE(c6,c7,SPACE(c2,c5)_AXIS1)_AXIS2
-#>  [1,]                            -0.3094922
-#>  [2,]                            -0.3094922
-#>  [3,]                             0.2475938
-#>  [4,]                             0.2475938
-#>  [5,]                             0.2475938
-#>  [6,]                             0.5570860
-#>  [7,]                             0.2475938
-#>  [8,]                             0.2475938
-#>  [9,]                            -0.3094922
-#> [10,]                            -0.3094922
+result <- make_full_rank_matrix(mat_test)
+result$matrix
+#>       (c1_AND_c4) SPACE_2_AXIS1 SPACE_2_AXIS2
+#>  [1,]           0     0.0000000     0.5477226
+#>  [2,]           0    -0.4082483     0.1825742
+#>  [3,]           1    -0.4082483    -0.3651484
+#>  [4,]           0    -0.4082483     0.1825742
+#>  [5,]           0     0.0000000     0.5477226
+#>  [6,]           0    -0.4082483     0.1825742
+#>  [7,]           1    -0.4082483    -0.3651484
+#>  [8,]           0    -0.4082483     0.1825742
+#>  [9,]           1     0.0000000     0.0000000
+#> [10,]           1     0.0000000     0.0000000
 ```
 
 **`Smisc::findDepMat()`**:
 <https://rdrr.io/cran/Smisc/man/findDepMat.html>
 
+**NOTE**: this package was removed from CRAN as of 2020-01-26
+(<https://cran.r-project.org/web/packages/Smisc/index.html>) due to
+failing checks.
+
 This function indicates linearly dependent rows/columns, but it doesn’t
 state which rows/columns are linearly dependent with each other.
 
--   However, this function seems to not work well for one-hot encoded
-    matrices and the package doesn’t seem to be updated anymore (s. this
-    issue: <https://github.com/pnnl/Smisc/issues/24>).
+However, this function seems to not work well for one-hot encoded
+matrices and the package doesn’t seem to be updated anymore (s. this
+issue: <https://github.com/pnnl/Smisc/issues/24>).
 
-``` r
-# example provided by Smisc documentation
-Y <- matrix(c(1, 3, 4,
-              2, 6, 8,
-              7, 2, 9,
-              4, 1, 7,
-              3.5, 1, 4.5), byrow = TRUE, ncol = 3)
-Smisc::findDepMat(t(Y), rows = FALSE)
-#> [1] FALSE  TRUE FALSE FALSE  TRUE
-```
+    # example provided by Smisc documentation
+    Y <- matrix(c(1, 3, 4,
+                  2, 6, 8,
+                  7, 2, 9,
+                  4, 1, 7,
+                  3.5, 1, 4.5), byrow = TRUE, ncol = 3)
+    Smisc::findDepMat(t(Y), rows = FALSE)
 
 Trying with the model matrix from our example above:
 
-``` r
-Smisc::findDepMat(mat, rows=FALSE)
-#> Error in if (!depends[j]) { : missing value where TRUE/FALSE needed
-```
+    Smisc::findDepMat(mat, rows=FALSE)
+    #> Error in if (!depends[j]) { : missing value where TRUE/FALSE needed
