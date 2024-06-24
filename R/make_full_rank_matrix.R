@@ -70,7 +70,7 @@ remove_empty_columns <- function(mat, tol = 1e-12, verbose=FALSE) {
     mat <- mat[, !empty_col, drop=FALSE]
   }
   if (verbose){
-    message(sprintf("%i empty columns were removed. After removig empty columns the matrix contains %i columns.",
+    message(sprintf("%i empty columns were removed. After removing empty columns the matrix contains %i columns.",
                   sum(empty_col, na.rm = TRUE), ncol(mat)))
 
   }
