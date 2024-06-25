@@ -105,7 +105,7 @@ result$matrix
 ```
 **`Smisc::findDepMat()`**: https://rdrr.io/cran/Smisc/man/findDepMat.html
 
-**NOTE**: this package was removed from CRAN as of 2020-01-26 (https://cran.r-project.org/web/packages/Smisc/index.html) due to failing checks.
+**NOTE**: this package was removed from CRAN as of 2020-01-26 (https://CRAN.R-project.org/package=Smisc) due to failing checks.
 
 This function indicates linearly dependent rows/columns, but it doesn't state which rows/columns are linearly dependent with each other.
 

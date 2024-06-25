@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# fullRankMatrix - Produce a Design Matrix Full Rank
+# fullRankMatrix - Generation of Full Rank Design Matrix
 
 ```{r child = "vignettes/fullrankmat-example.Rmd"}
 
