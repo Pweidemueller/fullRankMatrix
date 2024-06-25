@@ -1,5 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# fullRankMatrix - Produce a Design Matrix Full Rank
+
 <!-- badges: start -->
 <!-- badges: end -->
 
@@ -25,6 +28,13 @@ used in e.g. a linear model fit.
 
 ## Installation
 
+You can install `fullRankMatrix` directly from CRAN. Just paste the
+following snippet into your R console:
+
+``` r
+install.packages("fullRankMatrix")
+```
+
 You can install the development version of `fullRankMatrix` from
 [GitHub](https://github.com/Pweidemueller/fullRankMatrix) with:
 
@@ -43,8 +53,8 @@ citation("fullRankMatrix")
 #> To cite package 'fullRankMatrix' in publications use:
 #> 
 #>   Weidemueller P, Ahlmann-Eltze C (2023). _fullRankMatrix: Produce a
-#>   Full Rank Matrix_. R package version 0.0.0.9000,
-#>   <https://github.com/yourusername/fullRankMatrix>.
+#>   Full Rank Matrix_. R package version 0.1.0,
+#>   <https://github.com/Pweidemueller/fullRankMatrix>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -52,8 +62,8 @@ citation("fullRankMatrix")
 #>     title = {fullRankMatrix: Produce a Full Rank Matrix},
 #>     author = {Paula Weidemueller and Constantin Ahlmann-Eltze},
 #>     year = {2023},
-#>     note = {R package version 0.0.0.9000},
-#>     url = {https://github.com/yourusername/fullRankMatrix},
+#>     note = {R package version 0.1.0},
+#>     url = {https://github.com/Pweidemueller/fullRankMatrix},
 #>   }
 ```
 
@@ -151,25 +161,23 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -1.00645  1.00645 -0.06064  0.06064 -0.88039  0.81975  0.06064 -1.92324 
-#>        9       10 
-#>  1.15589  0.70671 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  1.5385 -1.5385 -0.1306  0.1306 -1.6339  1.5033  0.1306 -0.3654 -0.4865  0.7212 
 #> 
 #> Coefficients: (1 not defined because of singularities)
-#>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry   7.7492     1.1546   6.711  0.00111 **
-#> matapple        5.3242     0.8856   6.012  0.00183 **
-#> matpear        -0.2333     1.3135  -0.178  0.86598   
-#> matspring       1.5243     1.4950   1.020  0.35468   
-#> matsummer           NA         NA      NA       NA   
-#> matfall         0.9312     1.2833   0.726  0.50057   
+#>               Estimate Std. Error t value Pr(>|t|)    
+#> matstrawberry  11.0383     1.2521   8.816 0.000312 ***
+#> matapple        6.9185     0.9603   7.205 0.000803 ***
+#> matpear        -1.7900     1.4243  -1.257 0.264357    
+#> matspring      -0.6208     1.6212  -0.383 0.717501    
+#> matsummer           NA         NA      NA       NA    
+#> matfall         2.1452     1.3916   1.542 0.183825    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.343 on 5 degrees of freedom
-#> Multiple R-squared:  0.9772, Adjusted R-squared:  0.9543 
-#> F-statistic: 42.78 on 5 and 5 DF,  p-value: 0.0004179
+#> Residual standard error: 1.456 on 5 degrees of freedom
+#> Multiple R-squared:  0.9827, Adjusted R-squared:  0.9654 
+#> F-statistic: 56.83 on 5 and 5 DF,  p-value: 0.0002097
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
@@ -233,24 +241,22 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_fr + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -1.00645  1.00645 -0.06064  0.06064 -0.88039  0.81975  0.06064 -1.92324 
-#>        9       10 
-#>  1.15589  0.70671 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  1.5385 -1.5385 -0.1306  0.1306 -1.6339  1.5033  0.1306 -0.3654 -0.4865  0.7212 
 #> 
 #> Coefficients:
-#>                     Estimate Std. Error t value Pr(>|t|)   
-#> mat_frpear           -0.2333     1.3135  -0.178  0.86598   
-#> mat_frspring          1.5243     1.4950   1.020  0.35468   
-#> mat_frfall            0.9312     1.2833   0.726  0.50057   
-#> mat_frSPACE_1_AXIS1 -15.4983     2.3092  -6.711  0.00111 **
-#> mat_frSPACE_1_AXIS2  -9.2218     1.5338  -6.012  0.00183 **
+#>                     Estimate Std. Error t value Pr(>|t|)    
+#> mat_frpear           -1.7900     1.4243  -1.257 0.264357    
+#> mat_frspring         -0.6208     1.6212  -0.383 0.717501    
+#> mat_frfall            2.1452     1.3916   1.542 0.183825    
+#> mat_frSPACE_1_AXIS1 -22.0766     2.5041  -8.816 0.000312 ***
+#> mat_frSPACE_1_AXIS2 -11.9833     1.6633  -7.205 0.000803 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.343 on 5 degrees of freedom
-#> Multiple R-squared:  0.9772, Adjusted R-squared:  0.9543 
-#> F-statistic: 42.78 on 5 and 5 DF,  p-value: 0.0004179
+#> Residual standard error: 1.456 on 5 degrees of freedom
+#> Multiple R-squared:  0.9827, Adjusted R-squared:  0.9654 
+#> F-statistic: 56.83 on 5 and 5 DF,  p-value: 0.0002097
 ```
 
 You can see that there are no more undefined columns. The columns
@@ -282,6 +288,29 @@ detect linear dependent columns. Here are the ones we are aware of:
 
 ``` r
 library(fullRankMatrix)
+
+# let's say we have 10 fruits and can classify them into strawberries, apples or pears
+# in addition we classify them by the season they were harvested in
+strawberry <- c(1,1,1,1,0,0,0,0,0,0)
+apple <- c(0,0,0,0,1,1,1,0,0,0)
+pear <- c(0,0,0,1,0,0,0,1,1,1)
+spring <- c(1,1,0,0,0,0,0,0,0,0)
+summer <- c(1,1,1,1,1,1,1,0,0,0)
+fall <- c(0,0,0,0,0,0,1,1,1,1)
+
+# let's pretend we know how each factor influences the sweetness of a fruit
+# in this case we say that strawberry and summer have the biggest influence on sweetness
+strawberry_sweet <- strawberry * rnorm(10, 4)
+apple_sweet <- apple * rnorm(10, 1)
+pear_sweet <- pear * rnorm(10, 0.5)
+spring_sweet <- spring * rnorm(10, 2)
+summer_sweet <- summer * rnorm(10, 5)
+fall_sweet <- fall * rnorm(10, 1)
+
+sweetness <- strawberry_sweet + apple_sweet + pear_sweet +
+  spring_sweet + summer_sweet + fall_sweet
+
+mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
 ```
 
 **`caret::findLinearCombos()`**:
@@ -312,24 +341,22 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_caret + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -1.00645  1.00645 -0.06064  0.06064 -0.88039  0.81975  0.06064 -1.92324 
-#>        9       10 
-#>  1.15589  0.70671 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  0.9150 -0.9150 -0.4841  0.4841  0.1310 -0.6151  0.4841 -1.0885 -1.9222  2.5265 
 #> 
 #> Coefficients:
 #>                     Estimate Std. Error t value Pr(>|t|)   
-#> mat_caretstrawberry   7.7492     1.1546   6.711  0.00111 **
-#> mat_caretapple        5.3242     0.8856   6.012  0.00183 **
-#> mat_caretpear        -0.2333     1.3135  -0.178  0.86598   
-#> mat_caretspring       1.5243     1.4950   1.020  0.35468   
-#> mat_caretfall         0.9312     1.2833   0.726  0.50057   
+#> mat_caretstrawberry   8.6680     1.4404   6.018  0.00182 **
+#> mat_caretapple        6.3176     1.1048   5.718  0.00229 **
+#> mat_caretpear        -0.2649     1.6386  -0.162  0.87790   
+#> mat_caretspring       2.0538     1.8651   1.101  0.32098   
+#> mat_caretfall         2.5202     1.6010   1.574  0.17626   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.343 on 5 degrees of freedom
-#> Multiple R-squared:  0.9772, Adjusted R-squared:  0.9543 
-#> F-statistic: 42.78 on 5 and 5 DF,  p-value: 0.0004179
+#> Residual standard error: 1.675 on 5 degrees of freedom
+#> Multiple R-squared:  0.9751, Adjusted R-squared:  0.9501 
+#> F-statistic:  39.1 on 5 and 5 DF,  p-value: 0.0005192
 ```
 
 **`WeightIt::make_full_rank()`**:
@@ -368,24 +395,22 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_weightit + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -1.00645  1.00645 -0.06064  0.06064 -0.88039  0.81975  0.06064 -1.92324 
-#>        9       10 
-#>  1.15589  0.70671 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  0.9150 -0.9150 -0.4841  0.4841  0.1310 -0.6151  0.4841 -1.0885 -1.9222  2.5265 
 #> 
 #> Coefficients:
 #>                        Estimate Std. Error t value Pr(>|t|)   
-#> mat_weightitstrawberry   7.7492     1.1546   6.711  0.00111 **
-#> mat_weightitapple        5.3242     0.8856   6.012  0.00183 **
-#> mat_weightitpear        -0.2333     1.3135  -0.178  0.86598   
-#> mat_weightitspring       1.5243     1.4950   1.020  0.35468   
-#> mat_weightitfall         0.9312     1.2833   0.726  0.50057   
+#> mat_weightitstrawberry   8.6680     1.4404   6.018  0.00182 **
+#> mat_weightitapple        6.3176     1.1048   5.718  0.00229 **
+#> mat_weightitpear        -0.2649     1.6386  -0.162  0.87790   
+#> mat_weightitspring       2.0538     1.8651   1.101  0.32098   
+#> mat_weightitfall         2.5202     1.6010   1.574  0.17626   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.343 on 5 degrees of freedom
-#> Multiple R-squared:  0.9772, Adjusted R-squared:  0.9543 
-#> F-statistic: 42.78 on 5 and 5 DF,  p-value: 0.0004179
+#> Residual standard error: 1.675 on 5 degrees of freedom
+#> Multiple R-squared:  0.9751, Adjusted R-squared:  0.9501 
+#> F-statistic:  39.1 on 5 and 5 DF,  p-value: 0.0005192
 ```
 
 **`plm::detect.lindep()`:**
@@ -423,16 +448,16 @@ plm::detect.lindep(mat_test)
 result <- make_full_rank_matrix(mat_test)
 result$matrix
 #>       (c1_AND_c4) SPACE_2_AXIS1 SPACE_2_AXIS2
-#>  [1,]           0    -0.3535534     0.2886751
-#>  [2,]           1    -0.3535534    -0.2886751
-#>  [3,]           0    -0.3535534     0.2886751
-#>  [4,]           1    -0.3535534    -0.2886751
-#>  [5,]           0    -0.3535534     0.2886751
-#>  [6,]           1     0.0000000     0.0000000
-#>  [7,]           1    -0.3535534    -0.2886751
-#>  [8,]           1    -0.3535534    -0.2886751
-#>  [9,]           0     0.0000000     0.5773503
-#> [10,]           0    -0.3535534     0.2886751
+#>  [1,]           0    -0.3333333     0.3726780
+#>  [2,]           1    -0.3333333    -0.2981424
+#>  [3,]           0    -0.3333333     0.3726780
+#>  [4,]           1    -0.3333333    -0.2981424
+#>  [5,]           1    -0.3333333    -0.2981424
+#>  [6,]           0    -0.3333333     0.3726780
+#>  [7,]           1     0.0000000     0.0000000
+#>  [8,]           1    -0.3333333    -0.2981424
+#>  [9,]           0    -0.3333333     0.3726780
+#> [10,]           1    -0.3333333    -0.2981424
 ```
 
 **`Smisc::findDepMat()`**:
