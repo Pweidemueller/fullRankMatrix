@@ -1,6 +1,6 @@
 #' Create a full rank matrix
 #'
-#' This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
+#' First remove empty columns. Then discover linear dependent columns. For each set of linearly dependent columns, create orthogonal vectors that span the space. Add these vectors as columns to the final matrix to replace the linearly dependent columns.
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
@@ -28,9 +28,10 @@
 #' # Turn the matrix into full rank, this will:
 #' # 1. remove empty columns (all zero)
 #' # 2. merge columns with the same entries (duplicates)
-#' # 3. identify linearly dependent columns and replace them with orthogonal vectors that span the same space
+#' # 3. identify linearly dependent columns
+#' # 4. replace them with orthogonal vectors that span the same space
 #' result <- make_full_rank_matrix(mat)
-#' # setting verbose=TRUE will give details on how many columns are removed in every step
+#' # verbose=TRUE will give details on how many columns are removed in every step
 #' result <- make_full_rank_matrix(mat, verbose=TRUE)
 #' # look at the create full rank matrix
 #' mat_full <- result$matrix

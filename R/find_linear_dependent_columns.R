@@ -10,7 +10,7 @@
 #'
 #' @seealso
 #' The algorithm and function is inspired by the `internalEnumLC`
-#' function in the `caret` package ([GitHub](https://github.com/topepo/caret/blob/679eabaac7e54f4e87efa6c3bff75659cb457d8b/pkg/caret/R/findLinearCombos.R#L33))
+#' function in the 'caret' package ([GitHub](https://github.com/topepo/caret/blob/679eabaac7e54f4e87efa6c3bff75659cb457d8b/pkg/caret/R/findLinearCombos.R#L33))
 #'
 #' @examples
 #'   mat <- matrix(rnorm(3 * 10), nrow = 10, ncol = 3)
@@ -37,7 +37,10 @@ find_linear_dependent_columns <- function(mat, tol = 1e-12){
     coef <- matrix(coef, ncol = length(dependent_columns))
     # The pivot relates columns in the QR decomposition object to the columns in the original matrix
     # The `sort` makes sure that the result looks good
-    lapply(seq_along(dependent_columns), function(i) sort(c(qr_mat$pivot[mat_rank + i], qr_mat$pivot[which(abs(coef[,i]) > tol)])))
+    lindep_sets <- lapply(seq_along(dependent_columns), function(i) sort(c(qr_mat$pivot[mat_rank + i], qr_mat$pivot[which(abs(coef[,i]) > tol)])))
+
+    connected_lindep_components <- find_connected_components(lindep_sets)
+    connected_lindep_components
   }
 }
 

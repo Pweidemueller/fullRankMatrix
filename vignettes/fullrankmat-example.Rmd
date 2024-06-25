@@ -1,8 +1,8 @@
 ---
-title: "fullRankMatrix - Make a Design Matrix Full Rank"
+title: "fullRankMatrix - Generation of Full Rank Design Matrix"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{fullrankmat-comparison}
+  %\VignetteIndexEntry{fullrankmat-example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -51,7 +51,7 @@ citation("fullRankMatrix")
 ```
 
 ## Linearly dependent columns span a space of a certain dimension
-In order to visualize it, let's look at a very simple example in 3D space. Say we have a matrix with three columns. The first column lies in the first and third dimension. The second and third column lie in the first and second dimension. Since this is a very simple example, we immediately spot that the third column is a multiple if the second column. If we draw the columns as vectors they lie perfectly on top of each other. This means instead of the two columns spanning a 2D space they just occupy a line, i.e. a 1D space. This is identified by `fullRankMatrix`, it replaces these two linearly dependent columns with one vector that captures the 1D space in which column 2 and column 2 used to lie. 
+In order to visualize it, let's look at a very simple example. Say we have a matrix with three columns, each with three entries. These columns can be visualized as vectors in a coordinate system with 3 axes (s. image). The first vector points into the plane spanned by the first and third axis. The second and third vectors lie in the plane spanned by the first and second axis. Since this is a very simple example, we immediately spot that the third column is a multiple of the second column. Their corresponding vectors lie perfectly on top of each other. This means instead of the two columns spanning a 2D space they just occupy a line, i.e. a 1D space. This is identified by `fullRankMatrix`, which replaces these two linearly dependent columns with one vector that describes the 1D space in which column 2 and column 3 used to lie. The resulting matrix is now full rank with no linearly dependent columns.
 
 
 ```{r setup}
@@ -71,7 +71,6 @@ make_full_rank_matrix(mat)
 knitr::include_graphics("man/figures/example_vectors.png")
 ```
 
-
 ## Worked through example
 
 Above was a rather abstract example that was easy to visualize, let's now walk through the utilities of `fullRankMatrix` when applied to a more realistic design matrix.
@@ -79,7 +78,7 @@ Above was a rather abstract example that was easy to visualize, let's now walk t
 When using linear models you should check if any of the columns in your design matrix are linearly dependent. If there are, this will alter the interpretation of the fit. Here is a rather constructed example where we are interested in identifying the factors that make fruit sweet. We can classify fruit into what fruit type they are and also at what season they were harvested in. 
 ```{r}
 # let's say we have 10 fruits and can classify them into strawberries, apples or pears
-# in addition we classify them by the season they were harvested in
+# in addition we indicate in which season(s) they are typically harvested
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
 apple <- c(0,0,0,0,1,1,1,0,0,0)
 pear <- c(0,0,0,1,0,0,0,1,1,1)
@@ -126,9 +125,13 @@ mat_fr
 fit <- lm(sweetness ~ mat_fr + 0)
 print(summary(fit))
 ```
-You can see that there are no more undefined columns. The columns `strawberry`, `apple` and `summer` were removed and replaced with two columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent (orthogonal) vectors that span the space previously spanned by the linearly dependent columns `strawberry`, `apple` and `summer`. The original columns that are contained with a space can be viewed in the returned `space_list`:
+You can see that there are no more undefined columns. The columns `strawberry`, `apple` and `summer` were removed and replaced with two columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent (orthogonal) vectors that span the space in which the linearly dependent columns `strawberry`, `apple` and `summer` lied.
+
+The original columns that are contained within a space can be viewed in the returned `space_list`:
 ```{r}
 space_list
 ```
 
-In terms of interpretation the individual axes of the space have no meaning, but seeing that the space of `strawberry`, `apple` and `summer` show a significant association with the sweetness of fruit. A further resolution which of the three terms is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three terms.
+In terms of interpretation the individual axes of the constructed spaces are difficult to interpret, but we see that the axes of the space of `strawberry`, `apple` and `summer` show a significant association with the sweetness of fruit. A further resolution which of the three terms is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three terms.
+
+If only a subset of all axes of a space show a significant association in the linear model fit, this could indicate that only a subset of linearly dependent columns that lie within the space spanned by the significantly associated axes drive this assocation. This would require some more detailed investigation by the user that would be specific to the use case.

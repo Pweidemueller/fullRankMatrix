@@ -13,8 +13,6 @@
 #'
 #' @examples
 #' validate_column_names(c("name", "age", "gender"))
-#' validate_column_names(c("name", NA, "gender")) # -> this should fail and return an error message
-#' validate_column_names(c("name", "", "gender")) # -> this should fail and return an error message
 #'
 validate_column_names <- function(names){
   if(is.null(names)){

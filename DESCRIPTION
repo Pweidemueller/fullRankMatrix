@@ -1,12 +1,15 @@
 Package: fullRankMatrix
-Title: Produce a Full Rank Matrix
-Version: 0.0.0.9000
+Title: Generation of Full Rank Design Matrix
+Version: 0.1.0
 Authors@R: 
     c(
     person("Paula", "Weidemueller", , "paulahw3214@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3867-3131", Twitter = "@PaulaH_W")),
     person("Constantin", "Ahlmann-Eltze", , "artjom31415@googlemail.com", role = c("aut"), comment = c(ORCID = "0000-0002-3762-068X", Twitter = "@const_ae"))
     )
-Description: This package will help users to create a full rank matrix out of their design matrix. It removes columns with only 0's, merged duplicated columns and discovers linearly dependent columns and then replaces linearly dependent columns with linearly independent columns that span the space of the original columns. This results in a full rank matrix that can be used as a design matrix in linear models.
+Description: Creates a full rank matrix out of a given matrix.
+  The intended use is for one-hot encoded design matrices that should be used in linear models to ensure interpretability of significant associations. However, 'fullRankMatrix' can be applied to any matrix to make it full rank.
+  It removes columns with only 0's, merges duplicated columns and discovers linearly dependent columns and replaces them with linearly independent columns that span the space of the original columns. Columns are renamed to reflect those modifications.
+  This results in a full rank matrix that can be used as a design matrix in linear models. The algorithm and some functions are inspired by Kuhn, M. (2008) <doi:10.18637/jss.v028.i05>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -15,6 +18,11 @@ Suggests:
     knitr,
     rmarkdown,
     igraph,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    WeightIt,
+    caret,
+    plm
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://github.com/Pweidemueller/fullRankMatrix
+BugReports: https://github.com/Pweidemueller/fullRankMatrix/issues

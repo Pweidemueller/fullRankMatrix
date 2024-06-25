@@ -1,16 +1,17 @@
-
-
-
-
 #' Find connected components in a graph
-#' 
+#'
 #' The function performs a depths-first search to find all connected components.
-#' 
+#'
 #' @param connections a list where each element is a vector with connected nodes.
 #'   Each node must be either a character or an integer.
-#'   
-#' @returns a list where each element is a set of connected items.
-#' 
+#'
+#' @return a list where each element is a set of connected items.
+#'
+#' @examples
+#'   find_connected_components(list(c(1,2), c(1,3), c(4,5)))
+#'
+#' @export
+#'
 find_connected_components <- function(connections){
   stopifnot(is.list(connections))
   is_char <- vapply(connections, \(con) is.character(con), FUN.VALUE = logical(1L))
@@ -23,13 +24,13 @@ find_connected_components <- function(connections){
     stop("Elements in 'connections' must be either characters or integers.")
   }
   nodes <- unique(unlist(connections, use.names = FALSE))
-  
+
   # Keep track which nodes I have visited
   visited <- new.env(parent = emptyenv(), size = length(nodes))
   for(n in nodes){
     visited[[n]] <- FALSE
   }
-  
+
   # Efficient access to neighbors of each node
   connection_graph <- new.env(parent = emptyenv(), size = length(nodes))
   for(con in connections){
@@ -37,7 +38,7 @@ find_connected_components <- function(connections){
       connection_graph[[n]] <- union(connection_graph[[n]], con)
     }
   }
-  
+
   # Depth-first search
   dfs <- function(graph, head){
     if(is.null(head)){
@@ -50,7 +51,7 @@ find_connected_components <- function(connections){
         queue <- list(head = n, tail = queue)
       }
     }
-    
+
     res <- character(length(nodes))
     res[1] <- head
     counter <- 2
@@ -69,7 +70,7 @@ find_connected_components <- function(connections){
         }
       }
     }
-    res[seq_len(counter-1)]
+    sort(res[seq_len(counter-1)])
   }
 
   result <- replicate(length(nodes), NULL)

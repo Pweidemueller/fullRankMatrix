@@ -16,3 +16,7 @@ a list where each element is a set of connected items.
 \description{
 The function performs a depths-first search to find all connected components.
 }
+\examples{
+  find_connected_components(list(c(1,2), c(1,3), c(4,5)))
+
+}
