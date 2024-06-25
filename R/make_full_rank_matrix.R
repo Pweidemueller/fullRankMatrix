@@ -9,12 +9,13 @@
 #' @return a list containing:
 #'    * `matrix`: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 #'        * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
-#'        * `SPACE_<i>_AXIS<j>` If columns were linearly dependent, a linearly independent space was created that contains these columns.
+#'        * `SPACE_<i>_AXIS<j>` For each set of linearly dependent columns, a space `i` with `max(j)` dimensions was created using orthogonal axes to replace the original columns.
 #'    * `space_list`: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
 #'
 #' @export
 #'
 #' @examples
+#' # Create a 1-hot encoded (zero/one) matrix
 #' c1 <- rbinom(10, 1, .4)
 #' c2 <- 1-c1
 #' c3 <- integer(10)
@@ -22,10 +23,19 @@
 #' c5 <- 2*c2
 #' c6 <- rbinom(10, 1, .8)
 #' c7 <- c5+c6
-#' mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
-#' make_full_rank_matrix(mat)
+#' # Turn into matrix
+#' mat <- cbind(c1, c2, c3, c4, c5, c6, c7)
+#' # Turn the matrix into full rank, this will:
+#' # 1. remove empty columns (all zero)
+#' # 2. merge columns with the same entries (duplicates)
+#' # 3. identify linearly dependent columns and replace them with orthogonal vectors that span the same space
+#' result <- make_full_rank_matrix(mat)
+#' # setting verbose=TRUE will give details on how many columns are removed in every step
 #' result <- make_full_rank_matrix(mat, verbose=TRUE)
+#' # look at the create full rank matrix
 #' mat_full <- result$matrix
+#' # check which linearly dependent columns spanned the identified spaces
+#' spaces <- result$space_list
 
 make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
 

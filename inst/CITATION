@@ -9,6 +9,6 @@ bibentry(
            email = "abc@gmail.com")
   ),
   year = 2023,
-  note = "R package version 0.0.0.9000",
-  url = "https://github.com/yourusername/fullRankMatrix"
+  note = "R package version 0.1.0",
+  url = "https://github.com/Pweidemueller/fullRankMatrix"
 )

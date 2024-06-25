@@ -13,13 +13,15 @@
 #'
 #' @examples
 #' validate_column_names(c("name", "age", "gender"))
+#' validate_column_names(c("name", NA, "gender")) # -> this should fail and return an error message
+#' validate_column_names(c("name", "", "gender")) # -> this should fail and return an error message
 #'
 validate_column_names <- function(names){
   if(is.null(names)){
     stop("The column names must not be `NULL`.")
   }
   if(any(grepl("^$", names))){
-    stop("The empty string `\"\"` is not a valid column name. See for example index: ", which(grepl("^$", names))[1])
+    stop("The empty string `\"\"` is not a valid column name. For example, name at index: ", which(grepl("^$", names))[1], " is empty.")
   }
   if(any(is.na(names))){
     stop("None of the names must be `NA`.")
