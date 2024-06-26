@@ -52,7 +52,7 @@ following command in your R console:
 citation("fullRankMatrix")
 #> To cite package 'fullRankMatrix' in publications use:
 #> 
-#>   Weidemueller P, Ahlmann-Eltze C (2023). _fullRankMatrix: Produce a
+#>   Weidemüller P, Ahlmann-Eltze C (2023). _fullRankMatrix: Produce a
 #>   Full Rank Matrix_. R package version 0.1.0,
 #>   <https://github.com/Pweidemueller/fullRankMatrix>.
 #> 
@@ -60,7 +60,7 @@ citation("fullRankMatrix")
 #> 
 #>   @Manual{,
 #>     title = {fullRankMatrix: Produce a Full Rank Matrix},
-#>     author = {Paula Weidemueller and Constantin Ahlmann-Eltze},
+#>     author = {Paula Weidemüller and Constantin Ahlmann-Eltze},
 #>     year = {2023},
 #>     note = {R package version 0.1.0},
 #>     url = {https://github.com/Pweidemueller/fullRankMatrix},
