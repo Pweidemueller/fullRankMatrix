@@ -70,7 +70,7 @@ test_that("make full rank column as expected", {
   c6 <- integer(10)
 
   mat <- as.matrix(data.frame(intercept, c1, c2, c3, c4, c5, c6))
-  result <- make_full_rank_matrix(mat, save_space_cols=FALSE)
+  result <- make_full_rank_matrix(mat)
   red_mat <- result$matrix
   space_list <- result$space_list
   expect_equal(ncol(red_mat), 3)
@@ -103,7 +103,7 @@ test_that("collapse_linearly_dependent_columns works", {
 
   mat <- matrix(rnorm(n = 10 * 4), nrow = 10, ncol = 4, dimnames = list(character(0L), paste0("col_", 1:4)))
   mat <- cbind(mat, comb_12 = mat[,1] + 2 * mat[,2], col_6 = rnorm(10))
-  result <- collapse_linearly_dependent_columns(mat, save_space_cols=FALSE)
+  result <- collapse_linearly_dependent_columns(mat)
   red_mat <- result$matrix
   space_list <- result$space_list
   expect_equal(ncol(red_mat), 5)
@@ -125,7 +125,7 @@ test_that("collapse_linearly_dependent_columns works", {
   c3 <- c1*3
   c4 <- c1*0.5
   mat <- cbind(c1,c2,c3,c4)
-  result <- make_full_rank_matrix(mat, save_space_cols=FALSE)
+  result <- make_full_rank_matrix(mat)
   red_mat <- result$matrix
   space_list <- result$space_list
   expect_equal(colnames(red_mat), c("SPACE_1_AXIS1"))

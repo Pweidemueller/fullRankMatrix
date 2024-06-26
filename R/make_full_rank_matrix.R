@@ -4,7 +4,6 @@
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
-#' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`. Default is FALSE.
 #'
 #' @return a list containing:
 #'    * `matrix`: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
@@ -38,7 +37,7 @@
 #' # check which linearly dependent columns spanned the identified spaces
 #' spaces <- result$space_list
 
-make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
+make_full_rank_matrix <- function(mat, verbose=FALSE){
 
   if (!is.matrix(mat)) {
     stop("The input is not a matrix.")
@@ -54,7 +53,7 @@ make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
   }
   mat_mod <- remove_empty_columns(mat, verbose=verbose)
   mat_mod <- merge_duplicated(mat_mod, verbose=verbose)
-  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose, save_space_cols=save_space_cols)
+  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose)
   mat_mod <- result$matrix
 
   if (ncol(mat_mod) > qr(mat)$rank){
@@ -124,18 +123,12 @@ merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
   return(mat)
 }
 
-collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE, save_space_cols = FALSE){
+collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
   stopifnot(is.matrix(mat))
   if (any(is.na(mat))) {
     stop("Error: The matrix contains NA values.")
   }
   validate_column_names(colnames(mat))
-
-  if (save_space_cols==TRUE) {
-    if (!dir.exists("SPACES")) {
-      dir.create("SPACES")
-    }
-  }
 
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
 
@@ -153,11 +146,6 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
     # Handle names
     # if a lot of linearly dependencies exist, adding the original column names to the new column names might get prohibitively large
     # instead label each new space by a number and save which original columns it was composed of in a corresponding file
-    if (save_space_cols==TRUE) {
-      space_file <- paste0("SPACES/SPACE_", space_counter, ".txt")
-      writeLines(colnames(dependent_columns), con = space_file)
-    }
-
     space_name <- paste0("SPACE_", space_counter)
     space_list[[space_name]] <- colnames(dependent_columns)
 
