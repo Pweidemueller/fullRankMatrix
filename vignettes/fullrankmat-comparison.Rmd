@@ -50,11 +50,11 @@ mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
 
 **`caret::findLinearCombos()`**: https://rdrr.io/cran/caret/man/findLinearCombos.html
 
-This function identifies which columns are linearly dependent and suggests which columns to remove. But it doesn't provide appropriate naming for the remaining columns to indicate that any significant associations with the remaining columns is actually an association with the space spanned by the originally linearly dependent columns. Just removing the 5th column (`summer`) and then fitting the linear model would lead to erroneous interpretation.
+This function identifies which columns are linearly dependent and suggests which columns to remove. But it doesn't provide appropriate naming for the remaining columns to indicate that any significant associations with the remaining columns is actually an association with the space spanned by the originally linearly dependent columns. Just removing the fifth column (`summer`) and then fitting the linear model would lead to erroneous interpretation.
 ```{r}
 caret_result <- caret::findLinearCombos(mat)
 ```
-Fitting a linear model with the 5th column (`summer`) removed would lead to erroneous interpretation that `strawberry` and `apple` influence the `sweetness`, but we know it is actually `strawberry` and `summer`.
+Fitting a linear model with the fifth column (`summer`) removed would lead to the erroneous interpretation that `strawberry` and `apple` influence the `sweetness`, but we know it is actually `strawberry` and `summer`.
 ```{r}
 mat_caret <- mat[, -caret_result$remove]
 fit <- lm(sweetness ~ mat_caret + 0)

@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 knitr::include_graphics("man/figures/fullRankMatrix.png")
 ```
 
-We developed `fullRankMatrix` primarily for one-hot encoded design matrices used in linear models. In our case, we were faced with a 1-hot encoded design matrix, that had a lot of linearly dependent columns. This happened when modelling a lot of interaction terms. Since fitting a linear model on a design matrix with linearly dependent columns will produce results that can lead to misleading interpretation (s. example below), we decided to develop a package that will help with identifying linearly dependent columns and replacing them with columns constructed of orthogonal vectors that span the space of the previously linearly dependent columns.
+We developed `fullRankMatrix` primarily for one-hot encoded design matrices used in linear models. In our case, we were faced with a 1-hot encoded design matrix, that had a lot of linearly dependent columns. This happened when modeling a lot of interaction terms. Since fitting a linear model on a design matrix with linearly dependent columns will produce results that can lead to misleading interpretation (s. example below), we decided to develop a package that will help with identifying linearly dependent columns and replacing them with columns constructed of orthogonal vectors that span the space of the previously linearly dependent columns.
 
-The goal of `fullRankMatrix` is to remove empty columns (contain only 0's), merge duplicated columns (containing the same entries) and merge linearly dependent columns. These operations will create a matrix of full rank. The changes made to the columns are reflected in the column headers such that the columns can still be interpreted if the matrix is used in e.g. a linear model fit.
+The goal of `fullRankMatrix` is to remove empty columns (contain only 0s), merge duplicated columns (containing the same entries) and merge linearly dependent columns. These operations will create a matrix of full rank. The changes made to the columns are reflected in the column headers such that the columns can still be interpreted if the matrix is used in e.g. a linear model fit.
 
 ## Installation
 
@@ -111,7 +111,7 @@ However, when you look at the model matrix you can see that the `summer` column 
 ```{r}
 mat
 ```
-To make such cases more obvious and retain interpretability of the linear model fit we wrote `fullRankMatrix`, it removes linearly dependent columns and renames the remaining columns to make the dependencies clear using the `make_full_rank_matrix()` function.
+To make such cases more obvious and to be able to still correctly interpret the linear model fit, we wrote `fullRankMatrix`. It removes linearly dependent columns and renames the remaining columns to make the dependencies clear using the `make_full_rank_matrix()` function.
 
 ```{r}
 library(fullRankMatrix)
@@ -134,4 +134,4 @@ space_list
 
 In terms of interpretation the individual axes of the constructed spaces are difficult to interpret, but we see that the axes of the space of `strawberry`, `apple` and `summer` show a significant association with the sweetness of fruit. A further resolution which of the three terms is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three terms.
 
-If only a subset of all axes of a space show a significant association in the linear model fit, this could indicate that only a subset of linearly dependent columns that lie within the space spanned by the significantly associated axes drive this assocation. This would require some more detailed investigation by the user that would be specific to the use case.
+If only a subset of all axes of a space show a significant association in the linear model fit, this could indicate that only a subset of linearly dependent columns that lie within the space spanned by the significantly associated axes drive this association. This would require some more detailed investigation by the user that would be specific to the use case.

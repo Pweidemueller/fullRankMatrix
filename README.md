@@ -11,7 +11,7 @@
 We developed `fullRankMatrix` primarily for one-hot encoded design
 matrices used in linear models. In our case, we were faced with a 1-hot
 encoded design matrix, that had a lot of linearly dependent columns.
-This happened when modelling a lot of interaction terms. Since fitting a
+This happened when modeling a lot of interaction terms. Since fitting a
 linear model on a design matrix with linearly dependent columns will
 produce results that can lead to misleading interpretation (s. example
 below), we decided to develop a package that will help with identifying
@@ -20,7 +20,7 @@ of orthogonal vectors that span the space of the previously linearly
 dependent columns.
 
 The goal of `fullRankMatrix` is to remove empty columns (contain only
-0’s), merge duplicated columns (containing the same entries) and merge
+0s), merge duplicated columns (containing the same entries) and merge
 linearly dependent columns. These operations will create a matrix of
 full rank. The changes made to the columns are reflected in the column
 headers such that the columns can still be interpreted if the matrix is
@@ -163,23 +163,25 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#> -1.0313  1.0313  0.7344 -0.7344 -1.1717  1.9061 -0.7344 -0.9273 -0.1276  1.7892 
+#>        1        2        3        4        5        6        7        8 
+#> -0.04988  0.04988  0.59500 -0.59500  2.14443 -1.54944 -0.59500  0.91027 
+#>        9       10 
+#>  2.04178 -2.35705 
 #> 
 #> Coefficients: (1 not defined because of singularities)
 #>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry    9.326      1.377   6.772  0.00107 **
-#> matapple         4.623      1.056   4.377  0.00717 **
-#> matpear         -1.782      1.567  -1.138  0.30683   
-#> matspring        0.194      1.783   0.109  0.91760   
+#> matstrawberry    8.176      1.659   4.928  0.00437 **
+#> matapple         7.346      1.272   5.773  0.00219 **
+#> matpear          2.372      1.887   1.257  0.26427   
+#> matspring        2.415      2.148   1.124  0.31199   
 #> matsummer           NA         NA      NA       NA   
-#> matfall          2.336      1.531   1.526  0.18750   
+#> matfall         -1.482      1.844  -0.804  0.45812   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.602 on 5 degrees of freedom
-#> Multiple R-squared:  0.9702, Adjusted R-squared:  0.9403 
-#> F-statistic: 32.53 on 5 and 5 DF,  p-value: 0.0008082
+#> Residual standard error: 1.93 on 5 degrees of freedom
+#> Multiple R-squared:  0.9671, Adjusted R-squared:  0.9342 
+#> F-statistic: 29.39 on 5 and 5 DF,  p-value: 0.00103
 ```
 
 As you can see `lm` realizes that there are linearly dependent columns
@@ -211,9 +213,9 @@ mat
 #> [10,]          0     0    1      0      0    1
 ```
 
-To make such cases more obvious and retain interpretability of the
-linear model fit we wrote `fullRankMatrix`, it removes linearly
-dependent columns and renames the remaining columns to make the
+To make such cases more obvious and to be able to still correctly
+interpret the linear model fit, we wrote `fullRankMatrix`. It removes
+linearly dependent columns and renames the remaining columns to make the
 dependencies clear using the `make_full_rank_matrix()` function.
 
 ``` r
@@ -243,22 +245,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_fr + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#> -1.0313  1.0313  0.7344 -0.7344 -1.1717  1.9061 -0.7344 -0.9273 -0.1276  1.7892 
+#>        1        2        3        4        5        6        7        8 
+#> -0.04988  0.04988  0.59500 -0.59500  2.14443 -1.54944 -0.59500  0.91027 
+#>        9       10 
+#>  2.04178 -2.35705 
 #> 
 #> Coefficients:
 #>                     Estimate Std. Error t value Pr(>|t|)   
-#> mat_frpear            -1.782      1.567  -1.138  0.30683   
-#> mat_frspring           0.194      1.783   0.109  0.91760   
-#> mat_frfall             2.336      1.531   1.526  0.18750   
-#> mat_frSPACE_1_AXIS1  -18.652      2.754  -6.772  0.00107 **
-#> mat_frSPACE_1_AXIS2   -8.008      1.829  -4.377  0.00717 **
+#> mat_frpear             2.372      1.887   1.257  0.26427   
+#> mat_frspring           2.415      2.148   1.124  0.31199   
+#> mat_frfall            -1.482      1.844  -0.804  0.45812   
+#> mat_frSPACE_1_AXIS1  -16.353      3.318  -4.928  0.00437 **
+#> mat_frSPACE_1_AXIS2  -12.723      2.204  -5.773  0.00219 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.602 on 5 degrees of freedom
-#> Multiple R-squared:  0.9702, Adjusted R-squared:  0.9403 
-#> F-statistic: 32.53 on 5 and 5 DF,  p-value: 0.0008082
+#> Residual standard error: 1.93 on 5 degrees of freedom
+#> Multiple R-squared:  0.9671, Adjusted R-squared:  0.9342 
+#> F-statistic: 29.39 on 5 and 5 DF,  p-value: 0.00103
 ```
 
 You can see that there are no more undefined columns. The columns
@@ -287,7 +291,7 @@ number of observations, but there is definitely an association of
 If only a subset of all axes of a space show a significant association
 in the linear model fit, this could indicate that only a subset of
 linearly dependent columns that lie within the space spanned by the
-significantly associated axes drive this assocation. This would require
+significantly associated axes drive this association. This would require
 some more detailed investigation by the user that would be specific to
 the use case.
 
@@ -331,16 +335,17 @@ suggests which columns to remove. But it doesn’t provide appropriate
 naming for the remaining columns to indicate that any significant
 associations with the remaining columns is actually an association with
 the space spanned by the originally linearly dependent columns. Just
-removing the 5th column (`summer`) and then fitting the linear model
+removing the fifth column (`summer`) and then fitting the linear model
 would lead to erroneous interpretation.
 
 ``` r
 caret_result <- caret::findLinearCombos(mat)
 ```
 
-Fitting a linear model with the 5th column (`summer`) removed would lead
-to erroneous interpretation that `strawberry` and `apple` influence the
-`sweetness`, but we know it is actually `strawberry` and `summer`.
+Fitting a linear model with the fifth column (`summer`) removed would
+lead to the erroneous interpretation that `strawberry` and `apple`
+influence the `sweetness`, but we know it is actually `strawberry` and
+`summer`.
 
 ``` r
 mat_caret <- mat[, -caret_result$remove]
@@ -351,22 +356,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_caret + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#>  0.8484 -0.8484  1.4612 -1.4612 -0.3650  1.8262 -1.4612  0.3887  0.3241  0.7484 
+#>        1        2        3        4        5        6        7        8 
+#> -0.71517  0.71517 -0.06501  0.06501 -0.64005  0.57504  0.06501 -2.65081 
+#>        9       10 
+#>  2.03035  0.55545 
 #> 
 #> Coefficients:
 #>                     Estimate Std. Error t value Pr(>|t|)    
-#> mat_caretstrawberry    9.966      1.339   7.443  0.00069 ***
-#> mat_caretapple         6.048      1.027   5.889  0.00201 ** 
-#> mat_caretpear         -1.045      1.523  -0.686  0.52314    
-#> mat_caretspring        2.048      1.734   1.181  0.29057    
-#> mat_caretfall          2.876      1.488   1.932  0.11115    
+#> mat_caretstrawberry  10.0193     1.3987   7.163 0.000824 ***
+#> mat_caretapple        5.6049     1.0727   5.225 0.003396 ** 
+#> mat_caretpear         0.2766     1.5911   0.174 0.868787    
+#> mat_caretspring       1.2345     1.8110   0.682 0.525720    
+#> mat_caretfall         1.3663     1.5545   0.879 0.419690    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.558 on 5 degrees of freedom
-#> Multiple R-squared:  0.9811, Adjusted R-squared:  0.9622 
-#> F-statistic: 51.98 on 5 and 5 DF,  p-value: 0.0002606
+#> Residual standard error: 1.627 on 5 degrees of freedom
+#> Multiple R-squared:  0.9777, Adjusted R-squared:  0.9553 
+#> F-statistic: 43.77 on 5 and 5 DF,  p-value: 0.0003955
 ```
 
 **`WeightIt::make_full_rank()`**:
@@ -405,22 +412,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_weightit + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#>  0.8484 -0.8484  1.4612 -1.4612 -0.3650  1.8262 -1.4612  0.3887  0.3241  0.7484 
+#>        1        2        3        4        5        6        7        8 
+#> -0.71517  0.71517 -0.06501  0.06501 -0.64005  0.57504  0.06501 -2.65081 
+#>        9       10 
+#>  2.03035  0.55545 
 #> 
 #> Coefficients:
 #>                        Estimate Std. Error t value Pr(>|t|)    
-#> mat_weightitstrawberry    9.966      1.339   7.443  0.00069 ***
-#> mat_weightitapple         6.048      1.027   5.889  0.00201 ** 
-#> mat_weightitpear         -1.045      1.523  -0.686  0.52314    
-#> mat_weightitspring        2.048      1.734   1.181  0.29057    
-#> mat_weightitfall          2.876      1.488   1.932  0.11115    
+#> mat_weightitstrawberry  10.0193     1.3987   7.163 0.000824 ***
+#> mat_weightitapple        5.6049     1.0727   5.225 0.003396 ** 
+#> mat_weightitpear         0.2766     1.5911   0.174 0.868787    
+#> mat_weightitspring       1.2345     1.8110   0.682 0.525720    
+#> mat_weightitfall         1.3663     1.5545   0.879 0.419690    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.558 on 5 degrees of freedom
-#> Multiple R-squared:  0.9811, Adjusted R-squared:  0.9622 
-#> F-statistic: 51.98 on 5 and 5 DF,  p-value: 0.0002606
+#> Residual standard error: 1.627 on 5 degrees of freedom
+#> Multiple R-squared:  0.9777, Adjusted R-squared:  0.9553 
+#> F-statistic: 43.77 on 5 and 5 DF,  p-value: 0.0003955
 ```
 
 **`plm::detect.lindep()`:**
@@ -458,16 +467,16 @@ plm::detect.lindep(mat_test)
 result <- make_full_rank_matrix(mat_test)
 result$matrix
 #>       (c1_AND_c4) SPACE_1_AXIS1 SPACE_1_AXIS2
-#>  [1,]           1     0.0000000    -0.5976143
-#>  [2,]           1     0.0000000     0.0000000
-#>  [3,]           1     0.0000000    -0.5976143
-#>  [4,]           0    -0.4472136     0.4780914
-#>  [5,]           1     0.0000000     0.0000000
-#>  [6,]           0    -0.4472136    -0.1195229
-#>  [7,]           1     0.0000000     0.0000000
-#>  [8,]           0    -0.4472136    -0.1195229
-#>  [9,]           0    -0.4472136    -0.1195229
-#> [10,]           0    -0.4472136    -0.1195229
+#>  [1,]           0    -0.4082483   -0.08512565
+#>  [2,]           1     0.0000000   -0.51075392
+#>  [3,]           0    -0.4082483    0.42562827
+#>  [4,]           1     0.0000000   -0.51075392
+#>  [5,]           1     0.0000000    0.00000000
+#>  [6,]           1     0.0000000   -0.51075392
+#>  [7,]           0    -0.4082483   -0.08512565
+#>  [8,]           0    -0.4082483   -0.08512565
+#>  [9,]           0    -0.4082483   -0.08512565
+#> [10,]           0    -0.4082483   -0.08512565
 ```
 
 **`Smisc::findDepMat()`**:
