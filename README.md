@@ -128,33 +128,31 @@ more realistic design matrix.
 When using linear models you should check if any of the columns in your
 design matrix are linearly dependent. If there are, this will alter the
 interpretation of the fit. Here is a rather constructed example where we
-are interested in identifying the factors that make fruit sweet. We can
-classify fruit into what fruit type they are and also at what season
-they were harvested in.
+are interested in identifying which ingredients contribute mostly to the
+sweetness of fruit salads.
 
 ``` r
-# let's say we have 10 fruits and can classify them into strawberries, apples or pears
-# in addition we indicate in which season(s) they are typically harvested
+# let's say we have 10 fruit salads and indicate which ingredients are present in each salad
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
-apple <- c(0,0,0,0,1,1,1,0,0,0)
+poppyseed <- c(0,0,0,0,1,1,1,0,0,0)
+orange <- c(1,1,1,1,1,1,1,0,0,0)
 pear <- c(0,0,0,1,0,0,0,1,1,1)
-spring <- c(1,1,0,0,0,0,0,0,0,0)
-summer <- c(1,1,1,1,1,1,1,0,0,0)
-fall <- c(0,0,0,0,0,0,1,1,1,1)
+mint <- c(1,1,0,0,0,0,0,0,0,0)
+apple <- c(0,0,0,0,0,0,1,1,1,1)
 
-# let's pretend we know how each factor influences the sweetness of a fruit
-# in this case we say that strawberry and summer have the biggest influence on sweetness
+# let's pretend we know how each factor influences the sweetness of a fruit salad
+# in this case we say that strawberries and oranges have the biggest influence on sweetness
 strawberry_sweet <- strawberry * rnorm(10, 4)
-apple_sweet <- apple * rnorm(10, 1)
+poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
+orange_sweet <- orange * rnorm(10, 5)
 pear_sweet <- pear * rnorm(10, 0.5)
-spring_sweet <- spring * rnorm(10, 2)
-summer_sweet <- summer * rnorm(10, 5)
-fall_sweet <- fall * rnorm(10, 1)
+mint_sweet <- mint * rnorm(10, 1)
+apple_sweet <- apple * rnorm(10, 2)
 
-sweetness <- strawberry_sweet + apple_sweet + pear_sweet +
-  spring_sweet + summer_sweet + fall_sweet
+sweetness <- strawberry_sweet + poppyseed_sweet+ orange_sweet + pear_sweet +
+  mint_sweet + apple_sweet 
 
-mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
+mat <- cbind(strawberry,poppyseed,orange,pear,mint,apple)
 
 fit <- lm(sweetness ~ mat + 0)
 print(summary(fit))
@@ -163,54 +161,54 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -0.04988  0.04988  0.59500 -0.59500  2.14443 -1.54944 -0.59500  0.91027 
-#>        9       10 
-#>  2.04178 -2.35705 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  1.0825 -1.0825  0.1182 -0.1182 -0.7902  0.9085 -0.1182  0.7245  0.2693 -0.8755 
 #> 
 #> Coefficients: (1 not defined because of singularities)
-#>               Estimate Std. Error t value Pr(>|t|)   
-#> matstrawberry    8.176      1.659   4.928  0.00437 **
-#> matapple         7.346      1.272   5.773  0.00219 **
-#> matpear          2.372      1.887   1.257  0.26427   
-#> matspring        2.415      2.148   1.124  0.31199   
-#> matsummer           NA         NA      NA       NA   
-#> matfall         -1.482      1.844  -0.804  0.45812   
+#>               Estimate Std. Error t value Pr(>|t|)    
+#> matstrawberry  11.5022     0.8767  13.120 4.59e-05 ***
+#> matpoppyseed    3.4873     0.6724   5.186  0.00351 ** 
+#> matorange           NA         NA      NA       NA    
+#> matpear        -2.9214     0.9973  -2.929  0.03266 *  
+#> matmint        -3.1394     1.1351  -2.766  0.03957 *  
+#> matapple        5.5026     0.9744   5.647  0.00242 ** 
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.93 on 5 degrees of freedom
-#> Multiple R-squared:  0.9671, Adjusted R-squared:  0.9342 
-#> F-statistic: 29.39 on 5 and 5 DF,  p-value: 0.00103
+#> Residual standard error: 1.02 on 5 degrees of freedom
+#> Multiple R-squared:  0.9891, Adjusted R-squared:  0.9782 
+#> F-statistic: 90.57 on 5 and 5 DF,  p-value: 6.691e-05
 ```
 
-As you can see `lm` realizes that there are linearly dependent columns
-(`matsummer` is not defined) but it doesn’t indicate what columns it is
-linearly dependent with.
+As you can see `lm` realizes that “1 \[column\] not defined because of
+singularities” (`matorange` is not defined) but it doesn’t indicate what
+columns it is linearly dependent with.
 
 So if you would just look at the columns and not consider the `NA`
-further, you would interpret that `strawberry` and `apple` make fruit
-sweet.
+further, you would interpret that `strawberry` and `poppyseed` are the
+biggest contributors to the sweetness of fruit salads.
 
-However, when you look at the model matrix you can see that the `summer`
-column is a linear combination of the `strawberry` and `apple` columns
-(or vice versa). So truly any of the three factors could contribute to
-the sweetness of a fruit, the linear model has no way of recovering
-which one given these 10 examples.
+However, when you look at the model matrix you can see that the `orange`
+column is a linear combination of the `strawberry` and `poppyseed`
+columns (or vice versa). So truly any of the three factors could
+contribute to the sweetness of a fruit salad, the linear model has no
+way of recovering which one given these 10 examples. And since we
+constructed this example we know that `orange` and `strawberry` are the
+sweetest and `poppyseed` contributes least to the sweetness.
 
 ``` r
 mat
-#>       strawberry apple pear spring summer fall
-#>  [1,]          1     0    0      1      1    0
-#>  [2,]          1     0    0      1      1    0
-#>  [3,]          1     0    0      0      1    0
-#>  [4,]          1     0    1      0      1    0
-#>  [5,]          0     1    0      0      1    0
-#>  [6,]          0     1    0      0      1    0
-#>  [7,]          0     1    0      0      1    1
-#>  [8,]          0     0    1      0      0    1
-#>  [9,]          0     0    1      0      0    1
-#> [10,]          0     0    1      0      0    1
+#>       strawberry poppyseed orange pear mint apple
+#>  [1,]          1         0      1    0    1     0
+#>  [2,]          1         0      1    0    1     0
+#>  [3,]          1         0      1    0    0     0
+#>  [4,]          1         0      1    1    0     0
+#>  [5,]          0         1      1    0    0     0
+#>  [6,]          0         1      1    0    0     0
+#>  [7,]          0         1      1    0    0     1
+#>  [8,]          0         0      0    1    0     1
+#>  [9,]          0         0      0    1    0     1
+#> [10,]          0         0      0    1    0     1
 ```
 
 To make such cases more obvious and to be able to still correctly
@@ -224,17 +222,17 @@ result <- make_full_rank_matrix(mat)
 mat_fr <- result$matrix
 space_list <- result$space_list
 mat_fr
-#>       pear spring fall SPACE_1_AXIS1 SPACE_1_AXIS2
-#>  [1,]    0      1    0          -0.5     0.0000000
-#>  [2,]    0      1    0          -0.5     0.0000000
-#>  [3,]    0      0    0          -0.5     0.0000000
-#>  [4,]    1      0    0          -0.5     0.0000000
-#>  [5,]    0      0    0           0.0    -0.5773503
-#>  [6,]    0      0    0           0.0    -0.5773503
-#>  [7,]    0      0    1           0.0    -0.5773503
-#>  [8,]    1      0    1           0.0     0.0000000
-#>  [9,]    1      0    1           0.0     0.0000000
-#> [10,]    1      0    1           0.0     0.0000000
+#>       pear mint apple SPACE_1_AXIS1 SPACE_1_AXIS2
+#>  [1,]    0    1     0          -0.5     0.0000000
+#>  [2,]    0    1     0          -0.5     0.0000000
+#>  [3,]    0    0     0          -0.5     0.0000000
+#>  [4,]    1    0     0          -0.5     0.0000000
+#>  [5,]    0    0     0           0.0    -0.5773503
+#>  [6,]    0    0     0           0.0    -0.5773503
+#>  [7,]    0    0     1           0.0    -0.5773503
+#>  [8,]    1    0     1           0.0     0.0000000
+#>  [9,]    1    0     1           0.0     0.0000000
+#> [10,]    1    0     1           0.0     0.0000000
 ```
 
 ``` r
@@ -245,31 +243,29 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_fr + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -0.04988  0.04988  0.59500 -0.59500  2.14443 -1.54944 -0.59500  0.91027 
-#>        9       10 
-#>  2.04178 -2.35705 
+#>       1       2       3       4       5       6       7       8       9      10 
+#>  1.0825 -1.0825  0.1182 -0.1182 -0.7902  0.9085 -0.1182  0.7245  0.2693 -0.8755 
 #> 
 #> Coefficients:
-#>                     Estimate Std. Error t value Pr(>|t|)   
-#> mat_frpear             2.372      1.887   1.257  0.26427   
-#> mat_frspring           2.415      2.148   1.124  0.31199   
-#> mat_frfall            -1.482      1.844  -0.804  0.45812   
-#> mat_frSPACE_1_AXIS1  -16.353      3.318  -4.928  0.00437 **
-#> mat_frSPACE_1_AXIS2  -12.723      2.204  -5.773  0.00219 **
+#>                     Estimate Std. Error t value Pr(>|t|)    
+#> mat_frpear           -2.9214     0.9973  -2.929  0.03266 *  
+#> mat_frmint           -3.1394     1.1351  -2.766  0.03957 *  
+#> mat_frapple           5.5026     0.9744   5.647  0.00242 ** 
+#> mat_frSPACE_1_AXIS1 -23.0044     1.7534 -13.120 4.59e-05 ***
+#> mat_frSPACE_1_AXIS2  -6.0402     1.1646  -5.186  0.00351 ** 
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.93 on 5 degrees of freedom
-#> Multiple R-squared:  0.9671, Adjusted R-squared:  0.9342 
-#> F-statistic: 29.39 on 5 and 5 DF,  p-value: 0.00103
+#> Residual standard error: 1.02 on 5 degrees of freedom
+#> Multiple R-squared:  0.9891, Adjusted R-squared:  0.9782 
+#> F-statistic: 90.57 on 5 and 5 DF,  p-value: 6.691e-05
 ```
 
 You can see that there are no more undefined columns. The columns
-`strawberry`, `apple` and `summer` were removed and replaced with two
-columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent
-(orthogonal) vectors that span the space in which the linearly dependent
-columns `strawberry`, `apple` and `summer` lied.
+`strawberry`, `orange` and `poppyseed` were removed and replaced with
+two columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly
+independent (orthogonal) vectors that span the space in which the
+linearly dependent columns `strawberry`, `orange` and `poppyseed` lied.
 
 The original columns that are contained within a space can be viewed in
 the returned `space_list`:
@@ -277,16 +273,16 @@ the returned `space_list`:
 ``` r
 space_list
 #> $SPACE_1
-#> [1] "strawberry" "apple"      "summer"
+#> [1] "strawberry" "poppyseed"  "orange"
 ```
 
 In terms of interpretation the individual axes of the constructed spaces
 are difficult to interpret, but we see that the axes of the space of
-`strawberry`, `apple` and `summer` show a significant association with
-the sweetness of fruit. A further resolution which of the three terms is
-most strongly associated with `sweetness` is not possible with the given
-number of observations, but there is definitely an association of
-`sweetness` with the space spanned by the three terms.
+`strawberry`, `orange` and `poppyseed` show a significant association
+with the sweetness of fruit salads. A further resolution which of the
+three terms is most strongly associated with `sweetness` is not possible
+with the given number of observations, but there is definitely an
+association of `sweetness` with the space spanned by the three terms.
 
 If only a subset of all axes of a space show a significant association
 in the linear model fit, this could indicate that only a subset of
@@ -356,24 +352,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_caret + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -0.71517  0.71517 -0.06501  0.06501 -0.64005  0.57504  0.06501 -2.65081 
-#>        9       10 
-#>  2.03035  0.55545 
+#>         1         2         3         4         5         6         7         8 
+#>  0.636525 -0.636525 -0.801894  0.801894 -1.020094  0.218199  0.801894  0.009563 
+#>         9        10 
+#>  0.640653 -1.452110 
 #> 
 #> Coefficients:
 #>                     Estimate Std. Error t value Pr(>|t|)    
-#> mat_caretstrawberry  10.0193     1.3987   7.163 0.000824 ***
-#> mat_caretapple        5.6049     1.0727   5.225 0.003396 ** 
-#> mat_caretpear         0.2766     1.5911   0.174 0.868787    
-#> mat_caretspring       1.2345     1.8110   0.682 0.525720    
-#> mat_caretfall         1.3663     1.5545   0.879 0.419690    
+#> mat_caretstrawberry   7.6502     0.9686   7.898 0.000523 ***
+#> mat_caretapple        6.4264     0.7429   8.651 0.000341 ***
+#> mat_caretpear         2.8753     1.1019   2.609 0.047703 *  
+#> mat_caretspring       4.5879     1.2542   3.658 0.014623 *  
+#> mat_caretfall        -2.2864     1.0766  -2.124 0.087084 .  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.627 on 5 degrees of freedom
-#> Multiple R-squared:  0.9777, Adjusted R-squared:  0.9553 
-#> F-statistic: 43.77 on 5 and 5 DF,  p-value: 0.0003955
+#> Residual standard error: 1.127 on 5 degrees of freedom
+#> Multiple R-squared:  0.989,  Adjusted R-squared:  0.978 
+#> F-statistic: 89.75 on 5 and 5 DF,  p-value: 6.843e-05
 ```
 
 **`WeightIt::make_full_rank()`**:
@@ -412,24 +408,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_weightit + 0)
 #> 
 #> Residuals:
-#>        1        2        3        4        5        6        7        8 
-#> -0.71517  0.71517 -0.06501  0.06501 -0.64005  0.57504  0.06501 -2.65081 
-#>        9       10 
-#>  2.03035  0.55545 
+#>         1         2         3         4         5         6         7         8 
+#>  0.636525 -0.636525 -0.801894  0.801894 -1.020094  0.218199  0.801894  0.009563 
+#>         9        10 
+#>  0.640653 -1.452110 
 #> 
 #> Coefficients:
 #>                        Estimate Std. Error t value Pr(>|t|)    
-#> mat_weightitstrawberry  10.0193     1.3987   7.163 0.000824 ***
-#> mat_weightitapple        5.6049     1.0727   5.225 0.003396 ** 
-#> mat_weightitpear         0.2766     1.5911   0.174 0.868787    
-#> mat_weightitspring       1.2345     1.8110   0.682 0.525720    
-#> mat_weightitfall         1.3663     1.5545   0.879 0.419690    
+#> mat_weightitstrawberry   7.6502     0.9686   7.898 0.000523 ***
+#> mat_weightitapple        6.4264     0.7429   8.651 0.000341 ***
+#> mat_weightitpear         2.8753     1.1019   2.609 0.047703 *  
+#> mat_weightitspring       4.5879     1.2542   3.658 0.014623 *  
+#> mat_weightitfall        -2.2864     1.0766  -2.124 0.087084 .  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.627 on 5 degrees of freedom
-#> Multiple R-squared:  0.9777, Adjusted R-squared:  0.9553 
-#> F-statistic: 43.77 on 5 and 5 DF,  p-value: 0.0003955
+#> Residual standard error: 1.127 on 5 degrees of freedom
+#> Multiple R-squared:  0.989,  Adjusted R-squared:  0.978 
+#> F-statistic: 89.75 on 5 and 5 DF,  p-value: 6.843e-05
 ```
 
 **`plm::detect.lindep()`:**
@@ -467,16 +463,16 @@ plm::detect.lindep(mat_test)
 result <- make_full_rank_matrix(mat_test)
 result$matrix
 #>       (c1_AND_c4) SPACE_1_AXIS1 SPACE_1_AXIS2
-#>  [1,]           0    -0.4082483   -0.08512565
-#>  [2,]           1     0.0000000   -0.51075392
-#>  [3,]           0    -0.4082483    0.42562827
-#>  [4,]           1     0.0000000   -0.51075392
-#>  [5,]           1     0.0000000    0.00000000
-#>  [6,]           1     0.0000000   -0.51075392
-#>  [7,]           0    -0.4082483   -0.08512565
-#>  [8,]           0    -0.4082483   -0.08512565
-#>  [9,]           0    -0.4082483   -0.08512565
-#> [10,]           0    -0.4082483   -0.08512565
+#>  [1,]           0    -0.3779645    -0.1357688
+#>  [2,]           1     0.0000000    -0.4751910
+#>  [3,]           0    -0.3779645    -0.1357688
+#>  [4,]           1     0.0000000    -0.4751910
+#>  [5,]           0    -0.3779645    -0.1357688
+#>  [6,]           0    -0.3779645     0.3394221
+#>  [7,]           0    -0.3779645    -0.1357688
+#>  [8,]           1     0.0000000    -0.4751910
+#>  [9,]           0    -0.3779645     0.3394221
+#> [10,]           0    -0.3779645    -0.1357688
 ```
 
 **`Smisc::findDepMat()`**:

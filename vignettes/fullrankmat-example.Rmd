@@ -75,39 +75,38 @@ knitr::include_graphics("man/figures/example_vectors.png")
 
 Above was a rather abstract example that was easy to visualize, let's now walk through the utilities of `fullRankMatrix` when applied to a more realistic design matrix.
 
-When using linear models you should check if any of the columns in your design matrix are linearly dependent. If there are, this will alter the interpretation of the fit. Here is a rather constructed example where we are interested in identifying the factors that make fruit sweet. We can classify fruit into what fruit type they are and also at what season they were harvested in. 
+When using linear models you should check if any of the columns in your design matrix are linearly dependent. If there are, this will alter the interpretation of the fit. Here is a rather constructed example where we are interested in identifying which ingredients contribute mostly to the sweetness of fruit salads. 
 ```{r}
-# let's say we have 10 fruits and can classify them into strawberries, apples or pears
-# in addition we indicate in which season(s) they are typically harvested
+# let's say we have 10 fruit salads and indicate which ingredients are present in each salad
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
-apple <- c(0,0,0,0,1,1,1,0,0,0)
+poppyseed <- c(0,0,0,0,1,1,1,0,0,0)
+orange <- c(1,1,1,1,1,1,1,0,0,0)
 pear <- c(0,0,0,1,0,0,0,1,1,1)
-spring <- c(1,1,0,0,0,0,0,0,0,0)
-summer <- c(1,1,1,1,1,1,1,0,0,0)
-fall <- c(0,0,0,0,0,0,1,1,1,1)
+mint <- c(1,1,0,0,0,0,0,0,0,0)
+apple <- c(0,0,0,0,0,0,1,1,1,1)
 
-# let's pretend we know how each factor influences the sweetness of a fruit
-# in this case we say that strawberry and summer have the biggest influence on sweetness
+# let's pretend we know how each factor influences the sweetness of a fruit salad
+# in this case we say that strawberries and oranges have the biggest influence on sweetness
 strawberry_sweet <- strawberry * rnorm(10, 4)
-apple_sweet <- apple * rnorm(10, 1)
+poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
+orange_sweet <- orange * rnorm(10, 5)
 pear_sweet <- pear * rnorm(10, 0.5)
-spring_sweet <- spring * rnorm(10, 2)
-summer_sweet <- summer * rnorm(10, 5)
-fall_sweet <- fall * rnorm(10, 1)
+mint_sweet <- mint * rnorm(10, 1)
+apple_sweet <- apple * rnorm(10, 2)
 
-sweetness <- strawberry_sweet + apple_sweet + pear_sweet +
-  spring_sweet + summer_sweet + fall_sweet
+sweetness <- strawberry_sweet + poppyseed_sweet+ orange_sweet + pear_sweet +
+  mint_sweet + apple_sweet 
 
-mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
+mat <- cbind(strawberry,poppyseed,orange,pear,mint,apple)
 
 fit <- lm(sweetness ~ mat + 0)
 print(summary(fit))
 ```
-As you can see `lm` realizes that there are linearly dependent columns (`matsummer` is not defined) but it doesn't indicate what columns it is linearly dependent with.
+As you can see `lm` realizes that "1 [column] not defined because of singularities" (`matorange` is not defined) but it doesn't indicate what columns it is linearly dependent with.
 
-So if you would just look at the columns and not consider the `NA` further, you would interpret that `strawberry` and `apple` make fruit sweet.
+So if you would just look at the columns and not consider the `NA` further, you would interpret that `strawberry` and `poppyseed` are the biggest contributors to the sweetness of fruit salads.
 
-However, when you look at the model matrix you can see that the `summer` column is a linear combination of the `strawberry` and `apple` columns (or vice versa). So truly any of the three factors could contribute to the sweetness of a fruit, the linear model has no way of recovering which one given these 10 examples. 
+However, when you look at the model matrix you can see that the `orange` column is a linear combination of the `strawberry` and `poppyseed` columns (or vice versa). So truly any of the three factors could contribute to the sweetness of a fruit salad, the linear model has no way of recovering which one given these 10 examples. And since we constructed this example we know that `orange` and `strawberry` are the sweetest and `poppyseed` contributes least to the sweetness.
 ```{r}
 mat
 ```
@@ -125,13 +124,13 @@ mat_fr
 fit <- lm(sweetness ~ mat_fr + 0)
 print(summary(fit))
 ```
-You can see that there are no more undefined columns. The columns `strawberry`, `apple` and `summer` were removed and replaced with two columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent (orthogonal) vectors that span the space in which the linearly dependent columns `strawberry`, `apple` and `summer` lied.
+You can see that there are no more undefined columns. The columns `strawberry`, `orange` and `poppyseed` were removed and replaced with two columns (`SPACE_1_AXIS1`, `SPACE_1_AXIS2`) that are linearly independent (orthogonal) vectors that span the space in which the linearly dependent columns `strawberry`, `orange` and `poppyseed` lied.
 
 The original columns that are contained within a space can be viewed in the returned `space_list`:
 ```{r}
 space_list
 ```
 
-In terms of interpretation the individual axes of the constructed spaces are difficult to interpret, but we see that the axes of the space of `strawberry`, `apple` and `summer` show a significant association with the sweetness of fruit. A further resolution which of the three terms is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three terms.
+In terms of interpretation the individual axes of the constructed spaces are difficult to interpret, but we see that the axes of the space of `strawberry`, `orange` and `poppyseed` show a significant association with the sweetness of fruit salads. A further resolution which of the three terms is most strongly associated with `sweetness` is not possible with the given number of observations, but there is definitely an association of `sweetness` with the space spanned by the three terms.
 
 If only a subset of all axes of a space show a significant association in the linear model fit, this could indicate that only a subset of linearly dependent columns that lie within the space spanned by the significantly associated axes drive this association. This would require some more detailed investigation by the user that would be specific to the use case.
