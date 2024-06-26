@@ -4,14 +4,12 @@
 \alias{make_full_rank_matrix}
 \title{Create a full rank matrix}
 \usage{
-make_full_rank_matrix(mat, verbose = FALSE, save_space_cols = FALSE)
+make_full_rank_matrix(mat, verbose = FALSE)
 }
 \arguments{
 \item{mat}{A matrix.}
 
 \item{verbose}{Print how column numbers change with each operation.}
-
-\item{save_space_cols}{For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder \code{SPACES} within which the files will be saved:\verb{SPACE_<i>.txt}. Default is FALSE.}
 }
 \value{
 a list containing:
@@ -19,15 +17,16 @@ a list containing:
 \item \code{matrix}: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 \itemize{
 \item \code{(c1_AND_c2)} If multiple columns are exactly identical, only a single instance is retained.
-\item \verb{SPACE_<i>_AXIS<j>} If columns were linearly dependent, a linearly independent space was created that contains these columns.
+\item \verb{SPACE_<i>_AXIS<j>} For each set of linearly dependent columns, a space \code{i} with \code{max(j)} dimensions was created using orthogonal axes to replace the original columns.
 }
 \item \code{space_list}: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
 }
 }
 \description{
-This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
+First remove empty columns. Then discover linear dependent columns. For each set of linearly dependent columns, create orthogonal vectors that span the space. Add these vectors as columns to the final matrix to replace the linearly dependent columns.
 }
 \examples{
+# Create a 1-hot encoded (zero/one) matrix
 c1 <- rbinom(10, 1, .4)
 c2 <- 1-c1
 c3 <- integer(10)
@@ -35,8 +34,18 @@ c4 <- c1
 c5 <- 2*c2
 c6 <- rbinom(10, 1, .8)
 c7 <- c5+c6
-mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
-make_full_rank_matrix(mat)
+# Turn into matrix
+mat <- cbind(c1, c2, c3, c4, c5, c6, c7)
+# Turn the matrix into full rank, this will:
+# 1. remove empty columns (all zero)
+# 2. merge columns with the same entries (duplicates)
+# 3. identify linearly dependent columns
+# 4. replace them with orthogonal vectors that span the same space
+result <- make_full_rank_matrix(mat)
+# verbose=TRUE will give details on how many columns are removed in every step
 result <- make_full_rank_matrix(mat, verbose=TRUE)
+# look at the create full rank matrix
 mat_full <- result$matrix
+# check which linearly dependent columns spanned the identified spaces
+spaces <- result$space_list
 }

@@ -25,5 +25,5 @@ Find linear dependent columns in a design matrix
 }
 \seealso{
 The algorithm and function is inspired by the \code{internalEnumLC}
-function in the \code{caret} package (\href{https://github.com/topepo/caret/blob/679eabaac7e54f4e87efa6c3bff75659cb457d8b/pkg/caret/R/findLinearCombos.R#L33}{GitHub})
+function in the 'caret' package (\href{https://github.com/topepo/caret/blob/679eabaac7e54f4e87efa6c3bff75659cb457d8b/pkg/caret/R/findLinearCombos.R#L33}{GitHub})
 }

@@ -1,0 +1,127 @@
+---
+title: "fullRankMatrix - Comparison to other packages"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{fullrankmat-comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Other available packages that detect linear dependent columns
+There are already a few other packages out there that offer functions to detect linear dependent columns. Here are the ones we are aware of:
+
+```{r}
+library(fullRankMatrix)
+
+# let's say we have 10 fruit salads and indicate which ingredients are present in each salad
+strawberry <- c(1,1,1,1,0,0,0,0,0,0)
+poppyseed <- c(0,0,0,0,1,1,1,0,0,0)
+orange <- c(1,1,1,1,1,1,1,0,0,0)
+pear <- c(0,0,0,1,0,0,0,1,1,1)
+mint <- c(1,1,0,0,0,0,0,0,0,0)
+apple <- c(0,0,0,0,0,0,1,1,1,1)
+
+# let's pretend we know how each fruit influences the sweetness of a fruit salad
+# in this case we say that strawberries and oranges have the biggest influence on sweetness
+set.seed(30)
+strawberry_sweet <- strawberry * rnorm(10, 4)
+poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
+orange_sweet <- orange * rnorm(10, 5)
+pear_sweet <- pear * rnorm(10, 0.5)
+mint_sweet <- mint * rnorm(10, 1)
+apple_sweet <- apple * rnorm(10, 2)
+
+sweetness <- strawberry_sweet + poppyseed_sweet+ orange_sweet + pear_sweet +
+  mint_sweet + apple_sweet 
+
+mat <- cbind(strawberry,poppyseed,orange,pear,mint,apple)
+
+```
+
+
+
+**`caret::findLinearCombos()`**: https://rdrr.io/cran/caret/man/findLinearCombos.html
+
+This function identifies which columns are linearly dependent and suggests which columns to remove. But it doesn't provide appropriate naming for the remaining columns to indicate that any significant associations with the remaining columns are actually associations with the space spanned by the originally linearly dependent columns. Just removing the  and then fitting the linear model would lead to erroneous interpretation.
+```{r}
+caret_result <- caret::findLinearCombos(mat)
+```
+Fitting a linear model with the `orange` column removed would lead to the erroneous interpretation that `strawberry` and `poppyseed` have the biggest influence on the fruit salad `sweetness`, but we know it is actually `strawberry` and `orange`.
+```{r}
+mat_caret <- mat[, -caret_result$remove]
+fit <- lm(sweetness ~ mat_caret + 0)
+print(summary(fit))
+```
+
+
+**`WeightIt::make_full_rank()`**: https://rdrr.io/cran/WeightIt/man/make_full_rank.html
+
+This function removes some of the linearly dependent columns to create a full rank matrix, but doesn't rename the remaining columns accordingly. For the user it isn't clear which columns were linearly dependent and they can't choose which column will be removed.
+```{r}
+mat_weightit <- WeightIt::make_full_rank(mat, with.intercept = FALSE)
+mat_weightit
+```
+As above fitting a linear model with this full rank matrix would lead to erroneous interpretation that `strawberry` and `poppyseed` influence the `sweetness`, but we know it is actually `strawberry` and `orange`.
+
+```{r}
+fit <- lm(sweetness ~ mat_weightit + 0)
+print(summary(fit))
+```
+
+
+**`plm::detect.lindep()`:** https://rdrr.io/cran/plm/man/detect.lindep.html
+
+The function returns which columns are potentially linearly dependent.
+```{r}
+plm::detect.lindep(mat)
+```
+
+However it doesn't capture all cases. For example here `plm::detect.lindep()` says there are no dependent columns, while there are several:
+```{r}
+c1 <- rbinom(10, 1, .4)
+c2 <- 1-c1
+c3 <- integer(10)
+c4 <- c1
+c5 <- 2*c2
+c6 <- rbinom(10, 1, .8)
+c7 <- c5+c6
+mat_test <- as.matrix(data.frame(c1,c2,c3,c4,c5,c6,c7))
+
+plm::detect.lindep(mat_test)
+```
+
+`fullRankMatrix` captures these cases:
+```{r}
+result <- make_full_rank_matrix(mat_test)
+result$matrix
+```
+**`Smisc::findDepMat()`**: https://rdrr.io/cran/Smisc/man/findDepMat.html
+
+**NOTE**: this package was removed from CRAN as of 2020-01-26 (https://CRAN.R-project.org/package=Smisc) due to failing checks.
+
+This function indicates linearly dependent rows/columns, but it doesn't state which rows/columns are linearly dependent with each other.
+
+However, this function seems to not work well for one-hot encoded matrices and the package doesn't seem to be updated anymore (s. this issue: https://github.com/pnnl/Smisc/issues/24).
+```
+# example provided by Smisc documentation
+Y <- matrix(c(1, 3, 4,
+              2, 6, 8,
+              7, 2, 9,
+              4, 1, 7,
+              3.5, 1, 4.5), byrow = TRUE, ncol = 3)
+Smisc::findDepMat(t(Y), rows = FALSE)
+```
+
+Trying with the model matrix from our example above:
+```
+Smisc::findDepMat(mat, rows=FALSE)
+#> Error in if (!depends[j]) { : missing value where TRUE/FALSE needed
+```

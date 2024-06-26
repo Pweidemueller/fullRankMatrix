@@ -1,20 +1,20 @@
 #' Create a full rank matrix
 #'
-#' This function first removes empty columns. Then it discovers linear dependent columns, for each set of linearly dependent columns, orthogonal vectors are created that span the space. These vectors are added as columns to the final matrix to replace the linearly dependent columns.
+#' First remove empty columns. Then discover linear dependent columns. For each set of linearly dependent columns, create orthogonal vectors that span the space. Add these vectors as columns to the final matrix to replace the linearly dependent columns.
 #'
 #' @param mat A matrix.
 #' @param verbose Print how column numbers change with each operation.
-#' @param save_space_cols For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder `SPACES` within which the files will be saved:`SPACE_<i>.txt`. Default is FALSE.
 #'
 #' @return a list containing:
 #'    * `matrix`: A matrix of full rank. Column headers will be renamed to reflect how columns depend on each other.
 #'        * `(c1_AND_c2)` If multiple columns are exactly identical, only a single instance is retained.
-#'        * `SPACE_<i>_AXIS<j>` If columns were linearly dependent, a linearly independent space was created that contains these columns.
+#'        * `SPACE_<i>_AXIS<j>` For each set of linearly dependent columns, a space `i` with `max(j)` dimensions was created using orthogonal axes to replace the original columns.
 #'    * `space_list`: A named list where each element corresponds to a space and contains the names of the original linearly dependent columns that are contained within that space.
 #'
 #' @export
 #'
 #' @examples
+#' # Create a 1-hot encoded (zero/one) matrix
 #' c1 <- rbinom(10, 1, .4)
 #' c2 <- 1-c1
 #' c3 <- integer(10)
@@ -22,12 +22,22 @@
 #' c5 <- 2*c2
 #' c6 <- rbinom(10, 1, .8)
 #' c7 <- c5+c6
-#' mat <- as.matrix(data.frame(c1, c2, c3, c4, c5, c6, c7))
-#' make_full_rank_matrix(mat)
+#' # Turn into matrix
+#' mat <- cbind(c1, c2, c3, c4, c5, c6, c7)
+#' # Turn the matrix into full rank, this will:
+#' # 1. remove empty columns (all zero)
+#' # 2. merge columns with the same entries (duplicates)
+#' # 3. identify linearly dependent columns
+#' # 4. replace them with orthogonal vectors that span the same space
+#' result <- make_full_rank_matrix(mat)
+#' # verbose=TRUE will give details on how many columns are removed in every step
 #' result <- make_full_rank_matrix(mat, verbose=TRUE)
+#' # look at the create full rank matrix
 #' mat_full <- result$matrix
+#' # check which linearly dependent columns spanned the identified spaces
+#' spaces <- result$space_list
 
-make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
+make_full_rank_matrix <- function(mat, verbose=FALSE){
 
   if (!is.matrix(mat)) {
     stop("The input is not a matrix.")
@@ -43,7 +53,7 @@ make_full_rank_matrix <- function(mat, verbose=FALSE, save_space_cols=FALSE){
   }
   mat_mod <- remove_empty_columns(mat, verbose=verbose)
   mat_mod <- merge_duplicated(mat_mod, verbose=verbose)
-  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose, save_space_cols=save_space_cols)
+  result <- collapse_linearly_dependent_columns(mat_mod, verbose=verbose)
   mat_mod <- result$matrix
 
   if (ncol(mat_mod) > qr(mat)$rank){
@@ -113,18 +123,12 @@ merge_duplicated <- function(mat, tol = 1e-12, verbose=FALSE) {
   return(mat)
 }
 
-collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE, save_space_cols = FALSE){
+collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALSE){
   stopifnot(is.matrix(mat))
   if (any(is.na(mat))) {
     stop("Error: The matrix contains NA values.")
   }
   validate_column_names(colnames(mat))
-
-  if (save_space_cols==TRUE) {
-    if (!dir.exists("SPACES")) {
-      dir.create("SPACES")
-    }
-  }
 
   linear_dependencies <- find_linear_dependent_columns(mat, tol = tol)
 
@@ -142,11 +146,6 @@ collapse_linearly_dependent_columns <- function(mat, tol = 1e-12, verbose = FALS
     # Handle names
     # if a lot of linearly dependencies exist, adding the original column names to the new column names might get prohibitively large
     # instead label each new space by a number and save which original columns it was composed of in a corresponding file
-    if (save_space_cols==TRUE) {
-      space_file <- paste0("SPACES/SPACE_", space_counter, ".txt")
-      writeLines(colnames(dependent_columns), con = space_file)
-    }
-
     space_name <- paste0("SPACE_", space_counter)
     space_list[[space_name]] <- colnames(dependent_columns)
 
