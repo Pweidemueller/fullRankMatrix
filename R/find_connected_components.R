@@ -6,11 +6,10 @@
 #'   Each node must be either a character or an integer.
 #'
 #' @return a list where each element is a set of connected items.
-#'
+#' @export
 #' @examples
 #'   find_connected_components(list(c(1,2), c(1,3), c(4,5)))
 #'
-#' @export
 #'
 find_connected_components <- function(connections){
   stopifnot(is.list(connections))

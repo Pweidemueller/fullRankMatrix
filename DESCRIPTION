@@ -7,7 +7,7 @@ Authors@R:
     person("Constantin", "Ahlmann-Eltze", , "artjom31415@googlemail.com", role = c("aut"), comment = c(ORCID = "0000-0002-3762-068X", Twitter = "@const_ae"))
     )
 Description: Creates a full rank matrix out of a given matrix.
-  The intended use is for one-hot encoded design matrices that should be used in linear models to ensure interpretability of significant associations. However, 'fullRankMatrix' can be applied to any matrix to make it full rank.
+  The intended use is for one-hot encoded design matrices that should be used in linear models to ensure that significant associations can be correctly interpreted. However, 'fullRankMatrix' can be applied to any matrix to make it full rank.
   It removes columns with only 0's, merges duplicated columns and discovers linearly dependent columns and replaces them with linearly independent columns that span the space of the original columns. Columns are renamed to reflect those modifications.
   This results in a full rank matrix that can be used as a design matrix in linear models. The algorithm and some functions are inspired by Kuhn, M. (2008) <doi:10.18637/jss.v028.i05>.
 License: MIT + file LICENSE
