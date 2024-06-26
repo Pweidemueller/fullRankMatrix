@@ -4,14 +4,12 @@
 \alias{make_full_rank_matrix}
 \title{Create a full rank matrix}
 \usage{
-make_full_rank_matrix(mat, verbose = FALSE, save_space_cols = FALSE)
+make_full_rank_matrix(mat, verbose = FALSE)
 }
 \arguments{
 \item{mat}{A matrix.}
 
 \item{verbose}{Print how column numbers change with each operation.}
-
-\item{save_space_cols}{For each space of linearly dependent columns save a txt file containing the original columns that are contained with that space. This will create a folder \code{SPACES} within which the files will be saved:\verb{SPACE_<i>.txt}. Default is FALSE.}
 }
 \value{
 a list containing:

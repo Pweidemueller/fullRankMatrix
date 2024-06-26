@@ -85,8 +85,9 @@ pear <- c(0,0,0,1,0,0,0,1,1,1)
 mint <- c(1,1,0,0,0,0,0,0,0,0)
 apple <- c(0,0,0,0,0,0,1,1,1,1)
 
-# let's pretend we know how each factor influences the sweetness of a fruit salad
+# let's pretend we know how each fruit influences the sweetness of a fruit salad
 # in this case we say that strawberries and oranges have the biggest influence on sweetness
+set.seed(30)
 strawberry_sweet <- strawberry * rnorm(10, 4)
 poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
 orange_sweet <- orange * rnorm(10, 5)

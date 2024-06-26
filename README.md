@@ -140,8 +140,9 @@ pear <- c(0,0,0,1,0,0,0,1,1,1)
 mint <- c(1,1,0,0,0,0,0,0,0,0)
 apple <- c(0,0,0,0,0,0,1,1,1,1)
 
-# let's pretend we know how each factor influences the sweetness of a fruit salad
+# let's pretend we know how each fruit influences the sweetness of a fruit salad
 # in this case we say that strawberries and oranges have the biggest influence on sweetness
+set.seed(30)
 strawberry_sweet <- strawberry * rnorm(10, 4)
 poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
 orange_sweet <- orange * rnorm(10, 5)
@@ -161,23 +162,25 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#>  1.0825 -1.0825  0.1182 -0.1182 -0.7902  0.9085 -0.1182  0.7245  0.2693 -0.8755 
+#>        1        2        3        4        5        6        7        8 
+#> -2.00934  2.00934 -1.34248  1.34248  0.92807 -2.27054  1.34248 -0.01963 
+#>        9       10 
+#>  1.26385 -2.58670 
 #> 
 #> Coefficients: (1 not defined because of singularities)
-#>               Estimate Std. Error t value Pr(>|t|)    
-#> matstrawberry  11.5022     0.8767  13.120 4.59e-05 ***
-#> matpoppyseed    3.4873     0.6724   5.186  0.00351 ** 
-#> matorange           NA         NA      NA       NA    
-#> matpear        -2.9214     0.9973  -2.929  0.03266 *  
-#> matmint        -3.1394     1.1351  -2.766  0.03957 *  
-#> matapple        5.5026     0.9744   5.647  0.00242 ** 
+#>               Estimate Std. Error t value Pr(>|t|)   
+#> matstrawberry   8.9087     2.0267   4.396  0.00705 **
+#> matpoppyseed    6.5427     1.5544   4.209  0.00842 **
+#> matorange           NA         NA      NA       NA   
+#> matpear         1.2800     2.3056   0.555  0.60269   
+#> matmint         0.6582     2.6242   0.251  0.81193   
+#> matapple        1.2595     2.2526   0.559  0.60019   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.02 on 5 degrees of freedom
-#> Multiple R-squared:  0.9891, Adjusted R-squared:  0.9782 
-#> F-statistic: 90.57 on 5 and 5 DF,  p-value: 6.691e-05
+#> Residual standard error: 2.357 on 5 degrees of freedom
+#> Multiple R-squared:  0.9504, Adjusted R-squared:  0.9007 
+#> F-statistic: 19.15 on 5 and 5 DF,  p-value: 0.002824
 ```
 
 As you can see `lm` realizes that “1 \[column\] not defined because of
@@ -243,22 +246,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_fr + 0)
 #> 
 #> Residuals:
-#>       1       2       3       4       5       6       7       8       9      10 
-#>  1.0825 -1.0825  0.1182 -0.1182 -0.7902  0.9085 -0.1182  0.7245  0.2693 -0.8755 
+#>        1        2        3        4        5        6        7        8 
+#> -2.00934  2.00934 -1.34248  1.34248  0.92807 -2.27054  1.34248 -0.01963 
+#>        9       10 
+#>  1.26385 -2.58670 
 #> 
 #> Coefficients:
-#>                     Estimate Std. Error t value Pr(>|t|)    
-#> mat_frpear           -2.9214     0.9973  -2.929  0.03266 *  
-#> mat_frmint           -3.1394     1.1351  -2.766  0.03957 *  
-#> mat_frapple           5.5026     0.9744   5.647  0.00242 ** 
-#> mat_frSPACE_1_AXIS1 -23.0044     1.7534 -13.120 4.59e-05 ***
-#> mat_frSPACE_1_AXIS2  -6.0402     1.1646  -5.186  0.00351 ** 
+#>                     Estimate Std. Error t value Pr(>|t|)   
+#> mat_frpear            1.2800     2.3056   0.555  0.60269   
+#> mat_frmint            0.6582     2.6242   0.251  0.81193   
+#> mat_frapple           1.2595     2.2526   0.559  0.60019   
+#> mat_frSPACE_1_AXIS1 -17.8174     4.0535  -4.396  0.00705 **
+#> mat_frSPACE_1_AXIS2 -11.3322     2.6924  -4.209  0.00842 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.02 on 5 degrees of freedom
-#> Multiple R-squared:  0.9891, Adjusted R-squared:  0.9782 
-#> F-statistic: 90.57 on 5 and 5 DF,  p-value: 6.691e-05
+#> Residual standard error: 2.357 on 5 degrees of freedom
+#> Multiple R-squared:  0.9504, Adjusted R-squared:  0.9007 
+#> F-statistic: 19.15 on 5 and 5 DF,  p-value: 0.002824
 ```
 
 You can see that there are no more undefined columns. The columns
@@ -299,28 +304,28 @@ detect linear dependent columns. Here are the ones we are aware of:
 ``` r
 library(fullRankMatrix)
 
-# let's say we have 10 fruits and can classify them into strawberries, apples or pears
-# in addition we classify them by the season they were harvested in
+# let's say we have 10 fruit salads and indicate which ingredients are present in each salad
 strawberry <- c(1,1,1,1,0,0,0,0,0,0)
-apple <- c(0,0,0,0,1,1,1,0,0,0)
+poppyseed <- c(0,0,0,0,1,1,1,0,0,0)
+orange <- c(1,1,1,1,1,1,1,0,0,0)
 pear <- c(0,0,0,1,0,0,0,1,1,1)
-spring <- c(1,1,0,0,0,0,0,0,0,0)
-summer <- c(1,1,1,1,1,1,1,0,0,0)
-fall <- c(0,0,0,0,0,0,1,1,1,1)
+mint <- c(1,1,0,0,0,0,0,0,0,0)
+apple <- c(0,0,0,0,0,0,1,1,1,1)
 
-# let's pretend we know how each factor influences the sweetness of a fruit
-# in this case we say that strawberry and summer have the biggest influence on sweetness
+# let's pretend we know how each fruit influences the sweetness of a fruit salad
+# in this case we say that strawberries and oranges have the biggest influence on sweetness
+set.seed(30)
 strawberry_sweet <- strawberry * rnorm(10, 4)
-apple_sweet <- apple * rnorm(10, 1)
+poppyseed_sweet <- poppyseed * rnorm(10, 0.1)
+orange_sweet <- orange * rnorm(10, 5)
 pear_sweet <- pear * rnorm(10, 0.5)
-spring_sweet <- spring * rnorm(10, 2)
-summer_sweet <- summer * rnorm(10, 5)
-fall_sweet <- fall * rnorm(10, 1)
+mint_sweet <- mint * rnorm(10, 1)
+apple_sweet <- apple * rnorm(10, 2)
 
-sweetness <- strawberry_sweet + apple_sweet + pear_sweet +
-  spring_sweet + summer_sweet + fall_sweet
+sweetness <- strawberry_sweet + poppyseed_sweet+ orange_sweet + pear_sweet +
+  mint_sweet + apple_sweet 
 
-mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
+mat <- cbind(strawberry,poppyseed,orange,pear,mint,apple)
 ```
 
 **`caret::findLinearCombos()`**:
@@ -329,19 +334,19 @@ mat <- as.matrix(data.frame(strawberry,apple,pear,spring,summer,fall))
 This function identifies which columns are linearly dependent and
 suggests which columns to remove. But it doesn’t provide appropriate
 naming for the remaining columns to indicate that any significant
-associations with the remaining columns is actually an association with
+associations with the remaining columns are actually associations with
 the space spanned by the originally linearly dependent columns. Just
-removing the fifth column (`summer`) and then fitting the linear model
-would lead to erroneous interpretation.
+removing the and then fitting the linear model would lead to erroneous
+interpretation.
 
 ``` r
 caret_result <- caret::findLinearCombos(mat)
 ```
 
-Fitting a linear model with the fifth column (`summer`) removed would
-lead to the erroneous interpretation that `strawberry` and `apple`
-influence the `sweetness`, but we know it is actually `strawberry` and
-`summer`.
+Fitting a linear model with the `orange` column removed would lead to
+the erroneous interpretation that `strawberry` and `poppyseed` have the
+biggest influence on the fruit salad `sweetness`, but we know it is
+actually `strawberry` and `orange`.
 
 ``` r
 mat_caret <- mat[, -caret_result$remove]
@@ -352,24 +357,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_caret + 0)
 #> 
 #> Residuals:
-#>         1         2         3         4         5         6         7         8 
-#>  0.636525 -0.636525 -0.801894  0.801894 -1.020094  0.218199  0.801894  0.009563 
-#>         9        10 
-#>  0.640653 -1.452110 
+#>        1        2        3        4        5        6        7        8 
+#> -2.00934  2.00934 -1.34248  1.34248  0.92807 -2.27054  1.34248 -0.01963 
+#>        9       10 
+#>  1.26385 -2.58670 
 #> 
 #> Coefficients:
-#>                     Estimate Std. Error t value Pr(>|t|)    
-#> mat_caretstrawberry   7.6502     0.9686   7.898 0.000523 ***
-#> mat_caretapple        6.4264     0.7429   8.651 0.000341 ***
-#> mat_caretpear         2.8753     1.1019   2.609 0.047703 *  
-#> mat_caretspring       4.5879     1.2542   3.658 0.014623 *  
-#> mat_caretfall        -2.2864     1.0766  -2.124 0.087084 .  
+#>                     Estimate Std. Error t value Pr(>|t|)   
+#> mat_caretstrawberry   8.9087     2.0267   4.396  0.00705 **
+#> mat_caretpoppyseed    6.5427     1.5544   4.209  0.00842 **
+#> mat_caretpear         1.2800     2.3056   0.555  0.60269   
+#> mat_caretmint         0.6582     2.6242   0.251  0.81193   
+#> mat_caretapple        1.2595     2.2526   0.559  0.60019   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.127 on 5 degrees of freedom
-#> Multiple R-squared:  0.989,  Adjusted R-squared:  0.978 
-#> F-statistic: 89.75 on 5 and 5 DF,  p-value: 6.843e-05
+#> Residual standard error: 2.357 on 5 degrees of freedom
+#> Multiple R-squared:  0.9504, Adjusted R-squared:  0.9007 
+#> F-statistic: 19.15 on 5 and 5 DF,  p-value: 0.002824
 ```
 
 **`WeightIt::make_full_rank()`**:
@@ -383,22 +388,22 @@ they can’t choose which column will be removed.
 ``` r
 mat_weightit <- WeightIt::make_full_rank(mat, with.intercept = FALSE)
 mat_weightit
-#>       strawberry apple pear spring fall
-#>  [1,]          1     0    0      1    0
-#>  [2,]          1     0    0      1    0
-#>  [3,]          1     0    0      0    0
-#>  [4,]          1     0    1      0    0
-#>  [5,]          0     1    0      0    0
-#>  [6,]          0     1    0      0    0
-#>  [7,]          0     1    0      0    1
-#>  [8,]          0     0    1      0    1
-#>  [9,]          0     0    1      0    1
-#> [10,]          0     0    1      0    1
+#>       strawberry poppyseed pear mint apple
+#>  [1,]          1         0    0    1     0
+#>  [2,]          1         0    0    1     0
+#>  [3,]          1         0    0    0     0
+#>  [4,]          1         0    1    0     0
+#>  [5,]          0         1    0    0     0
+#>  [6,]          0         1    0    0     0
+#>  [7,]          0         1    0    0     1
+#>  [8,]          0         0    1    0     1
+#>  [9,]          0         0    1    0     1
+#> [10,]          0         0    1    0     1
 ```
 
 As above fitting a linear model with this full rank matrix would lead to
-erroneous interpretation that `strawberry` and `apple` influence the
-`sweetness`, but we know it is actually `strawberry` and `summer`.
+erroneous interpretation that `strawberry` and `poppyseed` influence the
+`sweetness`, but we know it is actually `strawberry` and `orange`.
 
 ``` r
 fit <- lm(sweetness ~ mat_weightit + 0)
@@ -408,24 +413,24 @@ print(summary(fit))
 #> lm(formula = sweetness ~ mat_weightit + 0)
 #> 
 #> Residuals:
-#>         1         2         3         4         5         6         7         8 
-#>  0.636525 -0.636525 -0.801894  0.801894 -1.020094  0.218199  0.801894  0.009563 
-#>         9        10 
-#>  0.640653 -1.452110 
+#>        1        2        3        4        5        6        7        8 
+#> -2.00934  2.00934 -1.34248  1.34248  0.92807 -2.27054  1.34248 -0.01963 
+#>        9       10 
+#>  1.26385 -2.58670 
 #> 
 #> Coefficients:
-#>                        Estimate Std. Error t value Pr(>|t|)    
-#> mat_weightitstrawberry   7.6502     0.9686   7.898 0.000523 ***
-#> mat_weightitapple        6.4264     0.7429   8.651 0.000341 ***
-#> mat_weightitpear         2.8753     1.1019   2.609 0.047703 *  
-#> mat_weightitspring       4.5879     1.2542   3.658 0.014623 *  
-#> mat_weightitfall        -2.2864     1.0766  -2.124 0.087084 .  
+#>                        Estimate Std. Error t value Pr(>|t|)   
+#> mat_weightitstrawberry   8.9087     2.0267   4.396  0.00705 **
+#> mat_weightitpoppyseed    6.5427     1.5544   4.209  0.00842 **
+#> mat_weightitpear         1.2800     2.3056   0.555  0.60269   
+#> mat_weightitmint         0.6582     2.6242   0.251  0.81193   
+#> mat_weightitapple        1.2595     2.2526   0.559  0.60019   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 1.127 on 5 degrees of freedom
-#> Multiple R-squared:  0.989,  Adjusted R-squared:  0.978 
-#> F-statistic: 89.75 on 5 and 5 DF,  p-value: 6.843e-05
+#> Residual standard error: 2.357 on 5 degrees of freedom
+#> Multiple R-squared:  0.9504, Adjusted R-squared:  0.9007 
+#> F-statistic: 19.15 on 5 and 5 DF,  p-value: 0.002824
 ```
 
 **`plm::detect.lindep()`:**
@@ -435,8 +440,8 @@ The function returns which columns are potentially linearly dependent.
 
 ``` r
 plm::detect.lindep(mat)
-#> [1] "Suspicious column number(s): 1, 2, 5"
-#> [1] "Suspicious column name(s):   strawberry, apple, summer"
+#> [1] "Suspicious column number(s): 1, 2, 3"
+#> [1] "Suspicious column name(s):   strawberry, poppyseed, orange"
 ```
 
 However it doesn’t capture all cases. For example here
@@ -463,16 +468,16 @@ plm::detect.lindep(mat_test)
 result <- make_full_rank_matrix(mat_test)
 result$matrix
 #>       (c1_AND_c4) SPACE_1_AXIS1 SPACE_1_AXIS2
-#>  [1,]           0    -0.3779645    -0.1357688
-#>  [2,]           1     0.0000000    -0.4751910
-#>  [3,]           0    -0.3779645    -0.1357688
-#>  [4,]           1     0.0000000    -0.4751910
-#>  [5,]           0    -0.3779645    -0.1357688
-#>  [6,]           0    -0.3779645     0.3394221
-#>  [7,]           0    -0.3779645    -0.1357688
-#>  [8,]           1     0.0000000    -0.4751910
-#>  [9,]           0    -0.3779645     0.3394221
-#> [10,]           0    -0.3779645    -0.1357688
+#>  [1,]           1     0.0000000  4.111431e-16
+#>  [2,]           0    -0.4082483 -5.419613e-17
+#>  [3,]           1     0.0000000  7.071068e-01
+#>  [4,]           0    -0.4082483  1.083923e-17
+#>  [5,]           1     0.0000000  7.071068e-01
+#>  [6,]           0    -0.4082483  1.083923e-17
+#>  [7,]           0    -0.4082483  1.083923e-17
+#>  [8,]           0    -0.4082483  1.083923e-17
+#>  [9,]           1     0.0000000  0.000000e+00
+#> [10,]           0    -0.4082483  1.083923e-17
 ```
 
 **`Smisc::findDepMat()`**:
