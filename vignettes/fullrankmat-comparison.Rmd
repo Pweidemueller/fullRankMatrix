@@ -50,7 +50,7 @@ mat <- cbind(strawberry,poppyseed,orange,pear,mint,apple)
 
 **`caret::findLinearCombos()`**: https://rdrr.io/cran/caret/man/findLinearCombos.html
 
-This function identifies which columns are linearly dependent and suggests which columns to remove. But it doesn't provide appropriate naming for the remaining columns to indicate that any significant associations with the remaining columns are actually associations with the space spanned by the originally linearly dependent columns. Just removing the  and then fitting the linear model would lead to erroneous interpretation.
+This function identifies which columns are linearly dependent and suggests which columns to remove. But it doesn't provide appropriate naming for the remaining columns to indicate that any significant associations with the remaining columns are actually associations with the space spanned by the originally linearly dependent columns. Just removing the indicated columns and then fitting the linear model would lead to erroneous interpretation.
 ```{r}
 caret_result <- caret::findLinearCombos(mat)
 ```

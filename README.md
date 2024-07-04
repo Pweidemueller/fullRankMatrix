@@ -336,8 +336,8 @@ suggests which columns to remove. But it doesn’t provide appropriate
 naming for the remaining columns to indicate that any significant
 associations with the remaining columns are actually associations with
 the space spanned by the originally linearly dependent columns. Just
-removing the and then fitting the linear model would lead to erroneous
-interpretation.
+removing the indicated columns and then fitting the linear model would
+lead to erroneous interpretation.
 
 ``` r
 caret_result <- caret::findLinearCombos(mat)
